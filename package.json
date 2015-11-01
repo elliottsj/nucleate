@@ -1,0 +1,23 @@
+{
+  "name": "nucleate",
+  "version": "0.0.1",
+  "description": "Coming soon",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elliottsj/nucleate.git"
+  },
+  "keywords": [
+    "react",
+    "webpack"
+  ],
+  "author": "Spencer Elliott <me@elliottsj.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elliottsj/nucleate/issues"
+  },
+  "homepage": "https://github.com/elliottsj/nucleate#readme"
+}
