@@ -2,8 +2,9 @@
   "name": "nucleate",
   "version": "0.0.1",
   "description": "Coming soon",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
+    "develop": "babel src --watch --out-dir lib",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,5 +20,34 @@
   "bugs": {
     "url": "https://github.com/elliottsj/nucleate/issues"
   },
-  "homepage": "https://github.com/elliottsj/nucleate#readme"
+  "homepage": "https://github.com/elliottsj/nucleate#readme",
+  "peerDependencies": {
+    "react": "^0.14.1",
+    "react-dom": "^0.14.1",
+    "webpack": "^1.12.2"
+  },
+  "devDependencies": {
+    "babel": "^5.8.29",
+    "babel-eslint": "^4.1.4",
+    "eslint": "^1.9.0",
+    "eslint-config-standard": "^4.4.0",
+    "eslint-config-standard-react": "^1.1.0",
+    "eslint-plugin-react": "^3.8.0",
+    "eslint-plugin-standard": "^1.3.1"
+  },
+  "dependencies": {
+    "front-matter-loader": "^0.1.0",
+    "history": "^1.13.0",
+    "html-loader": "^0.3.0",
+    "invariant": "^2.1.2",
+    "json-loader": "^0.5.3",
+    "markdown-it-loader": "^0.2.0",
+    "react-redux": "^4.0.0",
+    "react-router": "^1.0.0-rc4",
+    "redux": "^3.0.4",
+    "redux-devtools": "^2.1.5",
+    "redux-router": "^1.0.0-beta4",
+    "redux-thunk": "^1.0.0",
+    "static-site-generator-webpack-plugin": "elliottsj/static-site-generator-webpack-plugin"
+  }
 }
