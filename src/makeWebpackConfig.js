@@ -6,7 +6,6 @@ export default function makeWebpackConfig ({ srcDir }) {
     entry: 'nucleate/lib/entry',
     output: {
       path: './build/',
-      // publicPath: '/static/',
       filename: 'bundle.js',
       libraryTarget: 'umd'
     },
@@ -20,7 +19,11 @@ export default function makeWebpackConfig ({ srcDir }) {
         {
           test: /\.md$/,
           include: srcDir,
-          loader: 'html!markdown-it'
+          loaders: [
+            'html',
+            'markdown-it',
+            'front-matter?onlyBody' // Strip frontmatter before passing to markdown-it
+          ]
         }
       ]
     },
@@ -32,7 +35,6 @@ export default function makeWebpackConfig ({ srcDir }) {
     ],
     devtool: 'eval',
     devServer: {
-      historyApiFallback: true,
       stats: { chunkModules: false, colors: true }
     }
   }

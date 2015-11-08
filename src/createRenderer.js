@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import ReactDOMServer from 'react-dom/server'
 import { Provider } from 'react-redux'
@@ -11,8 +11,8 @@ import createRoutes from './createRoutes'
 import createStore from './createStore'
 
 export default function createRenderer () {
-  const { pages } = collectPages()
-  const routes = createRoutes({ pages })
+  const pages: Map<string, Component> = collectPages()
+  const routes = createRoutes(pages)
 
   // Client render
   if (typeof document !== 'undefined') {

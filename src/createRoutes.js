@@ -1,37 +1,22 @@
-import React from 'react'
-import { Route, IndexRoute } from 'react-router'
-import invariant from 'invariant'
+/* @flow */
 
-export default function createRoutes ({ pages }) {
-  const Index = pages['./index']
-  invariant(!!Index, 'index.js must be defined in your source directory')
+import path from 'path'
+import React, { Component } from 'react'
+import { Route } from 'react-router'
 
-  // return (
-  //   <Route path='/'>
-  //     <IndexRoute component={Index} />
-  //     {Object.keys(pages).filter(pth => pth !== './index').map(pth => {
-  //       const component = pages[pth]
-  //       return (
-  //         <Route
-  //           key={pth}
-  //           path={/*component.path*/ pth.slice(1)}
-  //           component={component}
-  //         />
-  //       )
-  //     })}
-  //   </Route>
-  // )
-  return [
-    <Route key={'./index'} path='/' component={Index} />,
-    ...Object.keys(pages).filter(pth => pth !== './index').map(pth => {
-      const component = pages[pth]
-      return (
-        <Route
-          key={pth}
-          path={component.permalink}
-          component={component}
-        />
-      )
-    })
-  ]
+function defaultPath (pth: string): string {
+  const lowerPth = pth.toLowerCase()
+  return path.basename(lowerPth) === 'index'
+    ? path.dirname(lowerPth.slice(1))
+    : lowerPth.slice(1)
+}
+
+export default function createRoutes (pages: Map<string, Component>): Array<Route> {
+  return [...pages].map(([pth, component]) =>
+    <Route
+      key={pth}
+      path={component.permalink || defaultPath(pth)}
+      component={component}
+    />
+  )
 }
