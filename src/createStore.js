@@ -1,5 +1,5 @@
 import { applyMiddleware, combineReducers, compose, createStore as createReduxStore } from 'redux'
-import { devTools } from 'redux-devtools'
+// import { devTools } from 'redux-devtools'
 import thunk from 'redux-thunk'
 import { reduxReactRouter, routerStateReducer } from 'redux-router'
 import { createHistory, createMemoryHistory } from 'history'
@@ -16,7 +16,7 @@ export default function createStore ({ browser }) {
     reduxReactRouter({
       createHistory: browser ? createHistory : createMemoryHistory
     }),
-    devTools()
+    // devTools()
   )(createReduxStore)
 
   return finalCreateStore(reducer)

@@ -6,7 +6,7 @@ import React, { Component, PropTypes } from 'react'
 export default class DefaultLayout extends Component {
   static propTypes = {
     children: PropTypes.node,
-    title: PropTypes.string.isRequired
+    title: PropTypes.string
   }
 
   render () {
@@ -14,7 +14,7 @@ export default class DefaultLayout extends Component {
     return (
       <html>
         <head>
-          <title>{title}</title>
+          <title>{title || 'Default Title'}</title>
           <script async src='/bundle.js'></script>
         </head>
         <body>

@@ -40,21 +40,19 @@ export default function createRenderer () {
           }
           const html = ReactDOMServer.renderToString(
             <Provider store={store}>
-              <ReduxRouter>
+              <ReduxRouter {...renderProps}>
                 {routes}
               </ReduxRouter>
             </Provider>
           )
-          // <RoutingContext {...renderProps} />
           resolve(html)
         })
       })
     }
 
-    const promises = routes.map(
+    return Promise.all(routes.map(
       route => renderPath(route.props.path)
-    )
-    return Promise.all(promises).then(renderedPages => {
+    )).then(renderedPages => {
       return renderedPages.reduce(
         (acc, html, i) => ({
           ...acc,
