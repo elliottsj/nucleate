@@ -3,6 +3,7 @@
 import path from 'path'
 import invariant from 'invariant'
 import wrapHtmlComponent from './wrapHtmlComponent'
+import page from './components/page'
 
 /**
  * Omit module paths which refer to the same module, keeping only
@@ -65,7 +66,7 @@ function zipPages ({ layouts, pagesContent, pagesFrontmatter }) {
 
       // Assume page is html; wrap in React component
       return {
-        [p]: wrapHtmlComponent({ layouts, html: content, frontmatter })
+        [p]: page(frontmatter)(wrapHtmlComponent({ layouts, html: content, frontmatter }))
       }
     })
     .reduce((acc, page) => ({
