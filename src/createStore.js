@@ -1,14 +1,16 @@
 import { applyMiddleware, combineReducers, compose, createStore as createReduxStore } from 'redux'
-// import { devTools } from 'redux-devtools'
 import thunk from 'redux-thunk'
 import { reduxReactRouter as reduxReactClientRouter, routerStateReducer } from 'redux-router'
 import { reduxReactRouter as reduxReactServerRouter } from 'redux-router/server'
 import { createHistory, createMemoryHistory } from 'history'
 
-export default function createStore ({ browser, routes }) {
+import nucleateReducer from './reducer'
+
+export default function createStore ({ browser, layouts, pages, routes }) {
   // Configure reducer to store state at state.router
   const reducer = combineReducers({
-    router: routerStateReducer
+    router: routerStateReducer,
+    nucleate: nucleateReducer
   })
 
   // Compose reduxReactRouter with other store enhancers
@@ -17,9 +19,10 @@ export default function createStore ({ browser, routes }) {
     (browser ? reduxReactClientRouter : reduxReactServerRouter)({
       createHistory: browser ? createHistory : createMemoryHistory,
       routes
-    }),
-    // devTools()
+    })
   )(createReduxStore)
 
-  return finalCreateStore(reducer)
+  return finalCreateStore(reducer, {
+    nucleate: { layouts, pages }
+  })
 }

@@ -3,7 +3,6 @@
 declare var __NUCLEATE_SRC_DIR__: string;
 
 import path from 'path'
-import invariant from 'invariant'
 import { Component } from 'react'
 import { map, zip } from 'wu'
 import wrapHtmlComponent from './wrapHtmlComponent'
@@ -34,25 +33,21 @@ function collectLayouts (): Map<string, Component> {
 }
 
 function collectPagesContent (): Map<string, Component | string> {
-  const req = require.context(__NUCLEATE_SRC_DIR__, true)
+  const req = require.context(__NUCLEATE_SRC_DIR__ + '/pages', true)
   const paths = dedupe(req.keys())
-  return paths
-    .filter(p => !p.startsWith('./layouts'))
-    .reduce(
-      (pages, pth) => pages.set(pth, req(pth)),
-      new Map()
-    )
+  return paths.reduce(
+    (pages, pth) => pages.set(pth, req(pth)),
+    new Map()
+  )
 }
 
 function collectPagesFrontmatter (): Map<string, Object> {
-  const req = require.context('!!json!front-matter!' + __NUCLEATE_SRC_DIR__, true)
+  const req = require.context('!!json!front-matter!' + __NUCLEATE_SRC_DIR__ + '/pages', true)
   const paths = dedupe(req.keys())
-  return paths
-    .filter(pth => !pth.startsWith('./layouts'))
-    .reduce(
-      (frontmatters, pth) => frontmatters.set(pth, req(pth).attributes),
-      new Map()
-    )
+  return paths.reduce(
+    (frontmatters, pth) => frontmatters.set(pth, req(pth).attributes),
+    new Map()
+  )
 }
 
 function zipPages ({ layouts, pagesContent, pagesFrontmatter }) {
@@ -77,5 +72,8 @@ export default function collectPages (): Map<string, Component> {
   const layouts = collectLayouts()
   const pagesContent = collectPagesContent()
   const pagesFrontmatter = collectPagesFrontmatter()
-  return zipPages({ layouts, pagesContent, pagesFrontmatter })
+  return {
+    layouts,
+    pages: zipPages({ layouts, pagesContent, pagesFrontmatter })
+  }
 }

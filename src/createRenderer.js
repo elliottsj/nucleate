@@ -11,12 +11,18 @@ import createRoutes from './createRoutes'
 import createStore from './createStore'
 
 export default function createRenderer () {
-  const pages: Map<string, Component> = collectPages()
+  const {
+    layouts,
+    pages
+  }: {
+    layouts: Map<string, Component>,
+    pages: Map<string, Component>
+  } = collectPages()
   const routes = createRoutes(pages)
 
   // Client render
   if (typeof document !== 'undefined') {
-    const store = createStore({ browser: true, routes })
+    const store = createStore({ browser: true, layouts, pages, routes })
     ReactDOM.render(
       <Provider store={store}>
         <ReduxRouter>
@@ -31,10 +37,8 @@ export default function createRenderer () {
   return function render (locals) {
     function renderPath (pth) {
       return new Promise((resolve, reject) => {
-        const store = createStore({ browser: false, routes })
-        debugger
+        const store = createStore({ browser: false, layouts, pages, routes })
         store.dispatch(match(pth, (error, redirectLocation, renderProps) => {
-          debugger
           if (error) {
             reject(error)
             return
