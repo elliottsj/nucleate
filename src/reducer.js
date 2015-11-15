@@ -1,6 +1,6 @@
 const DEFAULT_STATE = {
-  layouts: new Map(),
-  pages: new Map()
+  layouts: {},
+  pages: {}
 }
 
 export default function nucleate (state = DEFAULT_STATE, action) {

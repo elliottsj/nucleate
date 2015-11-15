@@ -1,13 +1,15 @@
+import { find } from 'wu'
 import path from 'path'
 import React from 'react'
 import DefaultLayout from './components/DefaultLayout'
 
 function getLayout ({ layouts, frontmatter }) {
   if (frontmatter.layout) {
-    const layoutPath = Object.keys(layouts).find(
-      pth => path.basename(pth) === frontmatter.layout
+    const [layoutPath] = find(
+      ([pth, _]) => path.basename(pth) === frontmatter.layout,
+      layouts
     )
-    return layouts[layoutPath]
+    return layouts.get(layoutPath)
   } else {
     // TODO: get default layout from user config
     return DefaultLayout

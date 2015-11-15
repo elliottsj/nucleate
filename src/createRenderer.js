@@ -2,9 +2,8 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import ReactDOMServer from 'react-dom/server'
 import { Provider } from 'react-redux'
-import { ReduxRouter } from 'redux-router'
-import { match } from 'redux-router/server'
-// import { createLocation } from 'history'
+import { match, Router, RoutingContext } from 'react-router'
+import { createHistory, createMemoryHistory, createLocation } from 'history'
 
 import collectPages from './collectPages'
 import createRoutes from './createRoutes'
@@ -18,16 +17,18 @@ export default function createRenderer () {
     layouts: Map<string, Component>,
     pages: Map<string, Component>
   } = collectPages()
+
   const routes = createRoutes(pages)
 
   // Client render
   if (typeof document !== 'undefined') {
-    const store = createStore({ browser: true, layouts, pages, routes })
+    const history = createHistory()
+    const store = createStore({ history, layouts, pages })
     ReactDOM.render(
       <Provider store={store}>
-        <ReduxRouter>
+        <Router history={history}>
           {routes}
-        </ReduxRouter>
+        </Router>
       </Provider>,
       document
     )
@@ -37,19 +38,20 @@ export default function createRenderer () {
   return function render (locals) {
     function renderPath (pth) {
       return new Promise((resolve, reject) => {
-        const store = createStore({ browser: false, layouts, pages, routes })
-        store.dispatch(match(pth, (error, redirectLocation, renderProps) => {
+        match({ routes, location: createLocation(pth) }, (error, redirectLocation, renderProps) => {
           if (error) {
             reject(error)
             return
           }
+          const history = createMemoryHistory()
+          const store = createStore({ history, layouts, pages })
           const html = ReactDOMServer.renderToString(
             <Provider store={store}>
-              <ReduxRouter {...renderProps} />
+              <RoutingContext {...renderProps} />
             </Provider>
           )
           resolve(html)
-        }))
+        })
       })
     }
 
