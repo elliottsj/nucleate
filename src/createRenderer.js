@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import ReactDOMServer from 'react-dom/server'
+import { createStore } from 'redux'
 import { Provider } from 'react-redux'
-import { match, Router, RoutingContext } from 'react-router'
-import { createHistory, createMemoryHistory, createLocation } from 'history'
+import { ReduxRouter } from 'redux-router'
+import { match } from 'redux-router/server'
 
+import applyNucleate from './applyNucleate'
 import collectPages from './collectPages'
 import createRoutes from './createRoutes'
-import createStore from './createStore'
 
 export default function createRenderer () {
   const {
@@ -18,17 +19,16 @@ export default function createRenderer () {
     pages: Map<string, Component>
   } = collectPages()
 
-  const routes = createRoutes(pages)
+  const routes = createRoutes({ layouts, pages })
 
   // Client render
   if (typeof document !== 'undefined') {
-    const history = createHistory()
-    const store = createStore({ history, layouts, pages })
+    const store = applyNucleate({ browser: true, layouts, pages, routes })(createStore)()
     ReactDOM.render(
       <Provider store={store}>
-        <Router history={history}>
+        <ReduxRouter>
           {routes}
-        </Router>
+        </ReduxRouter>
       </Provider>,
       document
     )
@@ -38,24 +38,23 @@ export default function createRenderer () {
   return function render (locals) {
     function renderPath (pth) {
       return new Promise((resolve, reject) => {
-        match({ routes, location: createLocation(pth) }, (error, redirectLocation, renderProps) => {
+        const store = applyNucleate({ browser: false, layouts, pages, routes })(createStore)()
+        store.dispatch(match(pth, (error, redirectLocation, routerState) => {
           if (error) {
             reject(error)
             return
           }
-          const history = createMemoryHistory()
-          const store = createStore({ history, layouts, pages })
           const html = ReactDOMServer.renderToString(
             <Provider store={store}>
-              <RoutingContext {...renderProps} />
+              <ReduxRouter {...routerState} />
             </Provider>
           )
           resolve(html)
-        })
+        }))
       })
     }
 
-    return Promise.all(routes.map(
+    return Promise.all(routes.props.children.map(
       route => {
         return renderPath(route.props.path)
       }
@@ -63,7 +62,7 @@ export default function createRenderer () {
       return renderedPages.reduce(
         (acc, html, i) => ({
           ...acc,
-          [routes[i].props.path]: html
+          [routes.props.children[i].props.path]: html
         }), {}
       )
     })

@@ -34,7 +34,7 @@
   "devDependencies": {
     "babel": "^5.8.29",
     "babel-core": "^5.8.34",
-    "babel-eslint": "^4.1.4",
+    "babel-eslint": "^4.1.5",
     "babel-jest": "^5.3.0",
     "eslint": "^1.9.0",
     "eslint-config-standard": "^4.4.0",
@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "front-matter-loader": "^0.1.1",
-    "history": "^1.13.0",
+    "history": "^1.13.1",
     "html-loader": "^0.3.0",
     "invariant": "^2.1.2",
     "json-loader": "^0.5.3",
@@ -54,7 +54,7 @@
     "react-router": "^1.0.0",
     "redux": "^3.0.4",
     "redux-devtools": "^2.1.5",
-    "redux-simple-router": "0.0.7",
+    "redux-router": "^1.0.0-beta4",
     "redux-thunk": "^1.0.0",
     "static-site-generator-webpack-plugin": "elliottsj/static-site-generator-webpack-plugin",
     "wu": "^2.1.0"

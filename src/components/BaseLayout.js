@@ -1,9 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 
-// @connect(state => ({
-//   bundlePath: state.nucleate.bundlePath
-// }))
-export default class DefaultLayout extends Component {
+export default class BaseLayout extends Component {
   static propTypes = {
     children: PropTypes.node,
     title: PropTypes.string
