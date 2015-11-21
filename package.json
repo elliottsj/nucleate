@@ -46,6 +46,7 @@
   "dependencies": {
     "front-matter-loader": "^0.1.1",
     "history": "^1.13.1",
+    "hoist-non-react-statics": "^1.0.3",
     "html-loader": "^0.3.0",
     "invariant": "^2.1.2",
     "json-loader": "^0.5.3",

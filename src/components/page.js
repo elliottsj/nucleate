@@ -1,18 +1,19 @@
 import React from 'react'
-
-function getDisplayName (WrappedComponent) {
-  return WrappedComponent.displayName || WrappedComponent.name || 'Component'
-}
+import hoistStatics from 'hoist-non-react-statics'
+import getDisplayName from '../util/getDisplayName'
 
 export default function (frontmatter) {
   return Page => {
-    function NucleatedPage (props) {
+    function NucleatePage (props) {
       return <Page {...frontmatter} {...props} />
     }
-    NucleatedPage.displayName = `NucleatedPage(${getDisplayName(Page)})`
-    NucleatedPage.title = frontmatter.title
-    NucleatedPage.description = frontmatter.description
-    NucleatedPage.permalink = frontmatter.permalink
-    return NucleatedPage
+
+    hoistStatics(NucleatePage, Page)
+
+    NucleatePage.displayName = `NucleatePage(${getDisplayName(Page)})`
+    NucleatePage.title = frontmatter.title
+    NucleatePage.description = frontmatter.description
+    NucleatePage.permalink = frontmatter.permalink
+    return NucleatePage
   }
 }

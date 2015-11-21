@@ -3,10 +3,12 @@
 declare var __NUCLEATE_SRC_DIR__: string;
 
 import path from 'path'
+import { compose } from 'redux'
 import { Component } from 'react'
 import { map, zip } from 'wu'
 import wrapHtmlComponent from './wrapHtmlComponent'
 import page from './components/page'
+import permalink from './components/permalink'
 
 /**
  * Omit module paths which refer to the same module, keeping only
@@ -50,17 +52,30 @@ function collectPagesFrontmatter (): Map<string, Object> {
   )
 }
 
+function makePage (pth, content, frontmatter, layouts) {
+  let component
+  if (typeof content !== 'string') {
+    // Page is already a component
+    component = compose(
+      permalink(pth)
+    )(content)
+  } else {
+    // Assume page is html; wrap in React component
+    component = compose(
+      permalink(pth),
+      page(frontmatter),
+      wrapHtmlComponent
+    )({ layouts, html: content, frontmatter })
+  }
+  return component
+}
+
 function zipPages ({ layouts, pagesContent, pagesFrontmatter }) {
   const zipped = zip(pagesContent, pagesFrontmatter)
-  const pages = map(([[pth, content], [_, frontmatter]]) => {
-    if (typeof content !== 'string') {
-      // Page is already a component
-      return [pth, content]
-    }
-
-    // Assume page is html; wrap in React component
-    return [pth, page(frontmatter)(wrapHtmlComponent({ layouts, html: content, frontmatter }))]
-  }, zipped)
+  const pages = map(
+    ([[pth, content], [_, frontmatter]]) => [pth, makePage(pth, content, frontmatter, layouts)],
+    zipped
+  )
   return new Map(pages)
 }
 
