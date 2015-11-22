@@ -6,6 +6,7 @@ import { Provider } from 'react-redux'
 import { ReduxRouter } from 'redux-router'
 import { match } from 'redux-router/server'
 
+import zipObj from './utils/zipObj'
 import applyNucleate from './applyNucleate'
 import collectPages from './collectPages'
 import createRoutes from './createRoutes'
@@ -19,7 +20,7 @@ export default function createRenderer () {
     pages: Map<string, Component>
   } = collectPages()
 
-  const routes = createRoutes({ layouts, pages })
+  const { paths, routes } = createRoutes({ layouts, pages })
 
   // Client render
   if (typeof document !== 'undefined') {
@@ -49,22 +50,13 @@ export default function createRenderer () {
               <ReduxRouter {...routerState} />
             </Provider>
           )
-          resolve(html)
+          resolve('<!DOCTYPE html>' + html)
         }))
       })
     }
 
-    return Promise.all(routes.props.children.map(
-      route => {
-        return renderPath(route.props.path)
-      }
-    )).then(renderedPages => {
-      return renderedPages.reduce(
-        (acc, html, i) => ({
-          ...acc,
-          [routes.props.children[i].props.path]: html
-        }), {}
-      )
+    return Promise.all(paths.map(renderPath)).then(renderedPages => {
+      return zipObj(paths, renderedPages)
     })
   }
 }

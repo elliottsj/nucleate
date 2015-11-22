@@ -1,11 +1,12 @@
 /* @flow */
 
-import { find } from 'wu'
+import { find, unique } from 'wu'
 import path from 'path'
 import React, { Component } from 'react'
 import { IndexRoute, Route } from 'react-router'
 
 import BaseLayout from './components/BaseLayout'
+import uniqBy from './utils/uniqBy'
 
 function getBaseLayout (layouts) {
   const layout = find(([pth]) => path.basename(pth) === 'Base', layouts)
@@ -16,21 +17,11 @@ function getBaseLayout (layouts) {
   }
 }
 
-function createRoute ([pth, component]) {
-  return pth === './index'
-    ? (
-      <IndexRoute
-        key={pth}
-        component={component}
-      />
-    )
-    : (
-      <Route
-        key={pth}
-        path={component.permalink}
-        component={component}
-      />
-    )
+function createRoute (component) {
+  if (component.path === '/') {
+    return <IndexRoute key={component.path} component={component} />
+  }
+  return <Route key={component.path} path={component.path} component={component} />
 }
 
 export default function createRoutes ({
@@ -39,11 +30,21 @@ export default function createRoutes ({
 }: {
   layouts: Map<string, Component>,
   pages: Map<string, Component>
-}): Array<Route> {
+}): {
+  paths: Array<string>,
+  routes: Array<Route>
+} {
   const Layout = getBaseLayout(layouts)
-  return (
+  const uniqPages = [...uniqBy(([_, component]) => component.path, pages)]
+
+  const routes = (
     <Route path='/' component={Layout}>
-      {[...pages].map(createRoute)}
+      {uniqPages.map(([_, component]) => createRoute(component))}
     </Route>
   )
+
+  return {
+    paths: uniqPages.map(([_, component]) => component.path),
+    routes
+  }
 }

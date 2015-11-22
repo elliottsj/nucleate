@@ -8,7 +8,7 @@ import { Component } from 'react'
 import { map, zip } from 'wu'
 import wrapHtmlComponent from './wrapHtmlComponent'
 import page from './components/page'
-import permalink from './components/permalink'
+import pathify from './components/pathify'
 
 /**
  * Omit module paths which refer to the same module, keeping only
@@ -57,12 +57,12 @@ function makePage (pth, content, frontmatter, layouts) {
   if (typeof content !== 'string') {
     // Page is already a component
     component = compose(
-      permalink(pth)
+      pathify(pth)
     )(content)
   } else {
     // Assume page is html; wrap in React component
     component = compose(
-      permalink(pth),
+      pathify(pth),
       page(frontmatter),
       wrapHtmlComponent
     )({ layouts, html: content, frontmatter })

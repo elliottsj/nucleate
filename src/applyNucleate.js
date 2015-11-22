@@ -4,7 +4,7 @@ import { reduxReactRouter as reduxReactClientRouter, routerStateReducer } from '
 import { reduxReactRouter as reduxReactServerRouter } from 'redux-router/server'
 import thunk from 'redux-thunk'
 
-import objectify from './util/objectify'
+import objectify from './utils/objectify'
 import nucleateReducer from './reducer'
 
 export default function applyNucleate ({ browser, pages, layouts, routes }) {

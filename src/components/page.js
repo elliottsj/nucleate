@@ -1,6 +1,6 @@
 import React from 'react'
 import hoistStatics from 'hoist-non-react-statics'
-import getDisplayName from '../util/getDisplayName'
+import getDisplayName from '../utils/getDisplayName'
 
 export default function (frontmatter) {
   return Page => {
