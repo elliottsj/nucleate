@@ -23,7 +23,7 @@ export default function wrapHtmlComponent ({ layouts, html, frontmatter }) {
   const Layout = getLayout({ layouts, frontmatter })
   return function HtmlFragment () {
     return (
-      <Layout>
+      <Layout {...frontmatter}>
         <div dangerouslySetInnerHTML={{ __html: html }} />
       </Layout>
     )

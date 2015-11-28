@@ -4,14 +4,14 @@ import getDisplayName from '../utils/getDisplayName'
 import defaultPath from '../utils/defaultPath'
 
 export default function pathify (pth) {
-  return NucleatePage => {
+  return Page => {
     function PathifiedPage (props) {
-      return <NucleatePage {...props} />
+      return <Page {...props} />
     }
 
-    hoistStatics(PathifiedPage, NucleatePage)
+    hoistStatics(PathifiedPage, Page)
 
-    PathifiedPage.displayName = `PathifiedPage(${getDisplayName(NucleatePage)})`
+    PathifiedPage.displayName = `PathifiedPage(${getDisplayName(Page)})`
     PathifiedPage.path = PathifiedPage.permalink || defaultPath(pth)
     return PathifiedPage
   }

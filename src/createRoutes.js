@@ -3,7 +3,7 @@
 import { find, unique } from 'wu'
 import path from 'path'
 import React, { Component } from 'react'
-import { IndexRoute, Route } from 'react-router'
+import { IndexRoute, Route, Redirect } from 'react-router'
 
 import BaseLayout from './components/BaseLayout'
 import uniqBy from './utils/uniqBy'
@@ -18,6 +18,9 @@ function getBaseLayout (layouts) {
 }
 
 function createRoute (component) {
+  if (component.redirectPath) {
+    return <Redirect key={component.path} from={component.path} to={component.redirectPath} />
+  }
   if (component.path === '/') {
     return <IndexRoute key={component.path} component={component} />
   }

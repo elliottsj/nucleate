@@ -5,6 +5,7 @@ import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { ReduxRouter } from 'redux-router'
 import { match } from 'redux-router/server'
+import { createLocation } from 'history'
 
 import zipObj from './utils/zipObj'
 import applyNucleate from './applyNucleate'
@@ -40,9 +41,13 @@ export default function createRenderer () {
     function renderPath (pth) {
       return new Promise((resolve, reject) => {
         const store = applyNucleate({ browser: false, layouts, pages, routes })(createStore)()
-        store.dispatch(match(pth, (error, redirectLocation, routerState) => {
+        const rematch = loc => match(loc, (error, redirectLocation, routerState) => {
           if (error) {
             reject(error)
+            return
+          }
+          if (redirectLocation) {
+            store.dispatch(rematch(redirectLocation))
             return
           }
           const html = ReactDOMServer.renderToString(
@@ -51,7 +56,8 @@ export default function createRenderer () {
             </Provider>
           )
           resolve('<!DOCTYPE html>' + html)
-        }))
+        })
+        store.dispatch(rematch(createLocation(pth)))
       })
     }
 
