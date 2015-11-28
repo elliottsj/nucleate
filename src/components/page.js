@@ -9,11 +9,9 @@ export default function (frontmatter) {
     }
 
     hoistStatics(NucleatePage, Page)
+    hoistStatics(NucleatePage, frontmatter)
 
     NucleatePage.displayName = `NucleatePage(${getDisplayName(Page)})`
-    NucleatePage.title = frontmatter.title
-    NucleatePage.description = frontmatter.description
-    NucleatePage.permalink = frontmatter.permalink
     return NucleatePage
   }
 }

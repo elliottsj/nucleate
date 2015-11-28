@@ -2,6 +2,7 @@ import webpack from 'webpack'
 import StaticSiteGeneratorPlugin from 'static-site-generator-webpack-plugin'
 
 export default function makeWebpackConfig ({ srcDir }) {
+  const isProduction = process.env.NODE_ENV === 'production'
   return {
     entry: 'nucleate/lib/entry',
     output: {
@@ -37,12 +38,23 @@ export default function makeWebpackConfig ({ srcDir }) {
       new webpack.DefinePlugin({
         __NUCLEATE_SRC_DIR__: JSON.stringify(srcDir)
       }),
-      new StaticSiteGeneratorPlugin('main')
+      new StaticSiteGeneratorPlugin('main'),
+      ...(isProduction
+        ? [
+          new webpack.optimize.UglifyJsPlugin({
+            compress: { warnings: false },
+            // sourceMap: false
+          })
+        ]
+        : []
+      )
     ],
     resolve: {
       root: srcDir
     },
-    devtool: 'eval',
+    devtool: isProduction
+      ? 'eval'
+      : undefined,
     devServer: {
       stats: { chunkModules: false, colors: true }
     }
