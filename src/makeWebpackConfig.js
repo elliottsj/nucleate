@@ -43,7 +43,7 @@ export default function makeWebpackConfig ({ srcDir }) {
         ? [
           new webpack.optimize.UglifyJsPlugin({
             compress: { warnings: false },
-            // sourceMap: false
+            sourceMap: false
           })
         ]
         : []

@@ -1,6 +1,3 @@
 {
-  "stage": 1,
-  "blacklist": [
-    "regenerator"
-  ]
+  "stage": 1
 }
