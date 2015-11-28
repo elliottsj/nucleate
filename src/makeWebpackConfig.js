@@ -6,6 +6,7 @@ export default function makeWebpackConfig ({ srcDir }) {
     entry: 'nucleate/lib/entry',
     output: {
       path: './build/',
+      publicPath: '/',
       filename: 'bundle.js',
       libraryTarget: 'umd'
     },
@@ -24,6 +25,11 @@ export default function makeWebpackConfig ({ srcDir }) {
             'markdown-it',
             'front-matter?onlyBody' // Strip frontmatter before passing to markdown-it
           ]
+        },
+        {
+          test: /\.(gif|jpg|jpeg|png|svg)/,
+          include: srcDir,
+          loader: 'file'
         }
       ]
     },
@@ -33,6 +39,9 @@ export default function makeWebpackConfig ({ srcDir }) {
       }),
       new StaticSiteGeneratorPlugin('main')
     ],
+    resolve: {
+      root: srcDir
+    },
     devtool: 'eval',
     devServer: {
       stats: { chunkModules: false, colors: true }

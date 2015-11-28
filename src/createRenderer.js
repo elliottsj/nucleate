@@ -12,7 +12,7 @@ import applyNucleate from './applyNucleate'
 import collectPages from './collectPages'
 import createRoutes from './createRoutes'
 
-export default function createRenderer () {
+export default function createRenderer ({ renderSite = site => site } = {}) {
   const {
     layouts,
     pages
@@ -27,11 +27,13 @@ export default function createRenderer () {
   if (typeof document !== 'undefined') {
     const store = applyNucleate({ browser: true, layouts, pages, routes })(createStore)()
     ReactDOM.render(
-      <Provider store={store}>
-        <ReduxRouter>
-          {routes}
-        </ReduxRouter>
-      </Provider>,
+      renderSite(
+        <Provider store={store}>
+          <ReduxRouter>
+            {routes}
+          </ReduxRouter>
+        </Provider>
+      ),
       document
     )
   }
@@ -51,9 +53,11 @@ export default function createRenderer () {
             return
           }
           const html = ReactDOMServer.renderToString(
-            <Provider store={store}>
-              <ReduxRouter {...routerState} />
-            </Provider>
+            renderSite(
+              <Provider store={store}>
+                <ReduxRouter {...routerState} />
+              </Provider>
+            )
           )
           resolve('<!DOCTYPE html>' + html)
         })
@@ -61,8 +65,8 @@ export default function createRenderer () {
       })
     }
 
-    return Promise.all(paths.map(renderPath)).then(renderedPages => {
-      return zipObj(paths, renderedPages)
-    })
+    return Promise.all(paths.map(renderPath)).then(renderedPages =>
+      zipObj(paths, renderedPages)
+    )
   }
 }
