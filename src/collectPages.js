@@ -29,7 +29,7 @@ function collectLayouts (): Map<string, Component> {
   const req = require.context(__NUCLEATE_SRC_DIR__ + '/layouts', true)
   const paths: Array<string> = dedupe(req.keys())
   return paths.reduce(
-    (layouts, pth) => layouts.set(pth, req(pth)),
+    (layouts, pth) => layouts.set(pth, req(pth).default || req(pth)),
     new Map()
   )
 }
@@ -38,7 +38,7 @@ function collectPagesContent (): Map<string, Component | string> {
   const req = require.context(__NUCLEATE_SRC_DIR__ + '/pages', true)
   const paths = dedupe(req.keys())
   return paths.reduce(
-    (pages, pth) => pages.set(pth, req(pth)),
+    (pages, pth) => pages.set(pth, req(pth).default || req(pth)),
     new Map()
   )
 }

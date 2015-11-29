@@ -1,4 +1,4 @@
-import 'babel-core/polyfill'
+import 'babel-polyfill'
 
 export { Link } from 'react-router'
 export { connect } from 'react-redux'

@@ -1,8 +1,8 @@
 /* @flow */
 
-import { find, unique } from 'wu'
+import { find } from 'wu'
 import path from 'path'
-import React, { Component } from 'react'
+import React from 'react'
 import { IndexRoute, Route, Redirect } from 'react-router'
 
 import BaseLayout from './components/BaseLayout'
@@ -30,9 +30,6 @@ function createRoute (component) {
 export default function createRoutes ({
   layouts,
   pages
-}: {
-  layouts: Map<string, Component>,
-  pages: Map<string, Component>
 }): {
   paths: Array<string>,
   routes: Array<Route>
