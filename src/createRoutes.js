@@ -13,7 +13,7 @@ function getBaseLayout (layouts) {
   if (layout) {
     return layout[1]
   } else {
-    BaseLayout
+    return BaseLayout
   }
 }
 
