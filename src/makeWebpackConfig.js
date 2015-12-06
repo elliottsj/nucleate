@@ -1,6 +1,6 @@
 import path from 'path'
 import webpack from 'webpack'
-import StaticSiteGeneratorPlugin from 'static-site-generator-webpack-plugin'
+import NucleatePlugin from 'nucleate-webpack-plugin'
 
 export default function makeWebpackConfig ({ srcDir }) {
   const isProduction = process.env.NODE_ENV === 'production'
@@ -34,7 +34,7 @@ export default function makeWebpackConfig ({ srcDir }) {
       new webpack.DefinePlugin({
         __NUCLEATE_SRC_DIR__: JSON.stringify(srcDir)
       }),
-      new StaticSiteGeneratorPlugin('main'),
+      new NucleatePlugin('main'),
       ...(isProduction
         ? [
           new webpack.optimize.UglifyJsPlugin({

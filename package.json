@@ -63,7 +63,7 @@
     "redux-router": "^1.0.0-beta4",
     "redux-thunk": "^1.0.0",
     "reselect": "^2.0.1",
-    "static-site-generator-webpack-plugin": "elliottsj/static-site-generator-webpack-plugin",
+    "nucleate-webpack-plugin": "^0.0.1",
     "wu": "^2.1.0"
   },
   "jest": {
