@@ -29,7 +29,8 @@
   "peerDependencies": {
     "react": "^0.14.1",
     "react-dom": "^0.14.1",
-    "webpack": "^1.12.2"
+    "webpack": "^1.12.2",
+    "webpack-dev-server": "^1.14.0"
   },
   "devDependencies": {
     "babel-cli": "^6.2.0",
