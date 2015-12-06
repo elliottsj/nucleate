@@ -1,3 +1,4 @@
+import path from 'path'
 import webpack from 'webpack'
 import StaticSiteGeneratorPlugin from 'static-site-generator-webpack-plugin'
 
@@ -51,6 +52,9 @@ export default function makeWebpackConfig ({ srcDir }) {
     ],
     resolve: {
       root: srcDir
+    },
+    resolveLoader: {
+      fallback: path.resolve(__dirname, '../node_modules')
     },
     devtool: isProduction
       ? 'eval'
