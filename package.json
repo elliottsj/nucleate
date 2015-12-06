@@ -1,7 +1,7 @@
 {
   "name": "nucleate",
   "version": "0.0.1",
-  "description": "Coming soon",
+  "description": "A static site generator powered by React, Redux, and webpack",
   "main": "lib/index.js",
   "scripts": {
     "build": "babel src --out-dir lib",
