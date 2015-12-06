@@ -18,15 +18,15 @@ export default function makeWebpackConfig ({ srcDir }) {
           test: /\.md$/,
           include: srcDir,
           loaders: [
-            'html',
-            'markdown-it',
-            'front-matter?onlyBody' // Strip frontmatter before passing to markdown-it
+            'html-loader',
+            'markdown-it-loader',
+            'front-matter-loader?onlyBody' // Strip frontmatter before passing to markdown-it
           ]
         },
         {
           test: /\.(gif|jpg|jpeg|png|svg)/,
           include: srcDir,
-          loader: 'file'
+          loader: 'file-loader'
         }
       ]
     },
