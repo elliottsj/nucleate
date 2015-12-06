@@ -15,11 +15,6 @@ export default function makeWebpackConfig ({ srcDir }) {
     module: {
       loaders: [
         {
-          test: /\.jsx?$/,
-          include: srcDir,
-          loader: 'babel'
-        },
-        {
           test: /\.md$/,
           include: srcDir,
           loaders: [
