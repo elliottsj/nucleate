@@ -10,6 +10,7 @@ export default function makeWebpackConfig ({ srcDir }) {
       path: './build/',
       publicPath: '/',
       filename: 'bundle.js',
+      pathinfo: !isProduction,
       libraryTarget: 'umd'
     },
     module: {
