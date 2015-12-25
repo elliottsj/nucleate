@@ -1,7 +1,6 @@
 import { find } from 'wu'
 import path from 'path'
 import React from 'react'
-import DefaultLayout from './components/DefaultLayout'
 
 function getLayout ({ layouts, frontmatter }) {
   if (frontmatter.layout) {
@@ -14,8 +13,8 @@ function getLayout ({ layouts, frontmatter }) {
     }
     return layouts.get(/* path: */ layout[0])
   } else {
-    // TODO: get default layout from user config
-    return DefaultLayout
+    // No layout configured; just render the children
+    return ({ children }) => children
   }
 }
 
