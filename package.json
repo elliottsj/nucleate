@@ -48,6 +48,7 @@
     "jest-cli": "^0.8.0"
   },
   "dependencies": {
+    "combine-loader": "^0.1.0",
     "file-loader": "^0.8.5",
     "front-matter-loader": "^0.1.2",
     "history": "^1.13.1",
