@@ -18,11 +18,10 @@ export default function makeWebpackConfig ({ srcDir }) {
         {
           test: /\.md$/,
           include: srcDir,
-          loaders: [
-            'html-loader',
-            'markdown-it-loader',
-            'front-matter-loader?onlyBody' // Strip frontmatter before passing to markdown-it
-          ]
+          loader: 'combine-loader?' + JSON.stringify({
+            frontmatter: ['json-loader', 'front-matter-loader?onlyAttributes'],
+            content: ['html-loader', 'markdown-it-loader', 'front-matter-loader?onlyBody']
+          })
         },
         {
           test: /\.(gif|jpg|jpeg|png|svg)/,
@@ -49,6 +48,8 @@ export default function makeWebpackConfig ({ srcDir }) {
     resolve: {
       root: srcDir
     },
+    // To avoid having loader peerDependencies,
+    // resolve loaders in ../node_modules as a fallback
     resolveLoader: {
       fallback: path.resolve(__dirname, '../node_modules')
     },
