@@ -1,5 +1,5 @@
 import path from 'path'
-import comp from './comp'
+import compose from './compose'
 
 function toLowerCase (str) {
   return str.toLowerCase()
@@ -35,7 +35,7 @@ function stripExtension (pth) {
  * @param  {String} pth  The path to a JS module, relative to the nucleate src dir
  * @return {String}      The absolute router path
  */
-export default comp(
+export default compose(
   stripExtension,
   stripIndex,
   trimLeft1,

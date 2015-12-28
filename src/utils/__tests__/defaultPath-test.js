@@ -1,4 +1,4 @@
-jest.dontMock('../comp')
+jest.dontMock('../compose')
 const defaultPath = require.requireActual('../defaultPath')
 
 describe('defaultPath', () => {
