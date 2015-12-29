@@ -22,11 +22,6 @@ export default function makeWebpackConfig ({ srcDir }) {
             frontmatter: ['json-loader', 'front-matter-loader?onlyAttributes'],
             content: ['html-loader', 'markdown-it-loader', 'front-matter-loader?onlyBody']
           })
-        },
-        {
-          test: /\.(gif|jpg|jpeg|png|svg)/,
-          include: srcDir,
-          loader: 'file-loader'
         }
       ]
     },
