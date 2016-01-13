@@ -25,7 +25,6 @@ export default function applyNucleate ({ browser, pages, layouts, routes }) {
     const store = finalCreateStore(finalReducer, {
       // Seed with initial data
       nucleate: {
-        currentPage: '',
         layouts: objectify(layouts),
         pages: objectify(pages)
       }

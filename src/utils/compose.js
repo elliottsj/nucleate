@@ -6,6 +6,6 @@
 export default function compose (...fs) {
   return (v, ...args) =>
     fs.reduceRight(
-      (g, f) => f(g, ...args), v
+      (g, f) => f(g, ...(g === v ? args : [])), v
     )
 }
