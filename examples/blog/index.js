@@ -1,12 +1,24 @@
-import React, { Component } from 'react'
-import { Assets } from 'nucleate'
-// import { includePages, pages, Link } from 'nucleate'
+import React, { Component, PropTypes } from 'react'
+import { Assets, includePages } from 'nucleate'
+/* Link, pages */
 
-// export const route = includePages(require.context('./pages'))
+export const route = includePages({
+  getChildRoutes (location, callback) {
+    require.ensure([], (require) => {
+      callback(null, require.context('./pages'))
+    })
+  }
+})
 
 export class component extends Component {
+  static propTypes = {
+    children: PropTypes.node
+  };
+
   render () {
     // const posts = pages(require.context('./pages'))
+    const { children } = this.props
+
     return (
       <html>
         <head>
@@ -23,7 +35,7 @@ export class component extends Component {
                 {/* <Link className='post-link' to='/post1'>Post 1 Title</Link> */}
               </li>
             </ul>
-
+            {children}
             <p className='rss-subscribe'>subscribe <a href='/feed.xml'>via RSS</a></p>
           </div>
         </body>

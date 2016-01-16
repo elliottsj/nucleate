@@ -4,7 +4,8 @@ import path from 'path'
 import Rx from 'rx-lite'
 import webpack from 'webpack'
 import webpackDevMiddleware from 'webpack-dev-middleware'
-import webpackHotMiddleware from 'webpack-hot-middleware'
+// TODO: fix https://github.com/glenjamin/webpack-hot-middleware/issues/18
+// import webpackHotMiddleware from 'webpack-hot-middleware'
 
 import configure from './webpack/configure'
 
@@ -27,9 +28,9 @@ function createWebpack$ (compiler) {
 }
 
 function evalBundle (stats) {
-  const bundleFilenames = stats.toJson().assetsByChunkName['main']
+  const bundleFilenames = stats.toJson().children.find(c => c.name === 'server').assetsByChunkName['main']
   const bundleFilename = Array.isArray(bundleFilenames) ? bundleFilenames[0] : bundleFilenames
-  const bundleAsset = stats.compilation.assets[bundleFilename]
+  const bundleAsset = stats.stats.find(s => s.compilation.name === 'server').compilation.assets[bundleFilename]
   const bundleSource = bundleAsset.source()
   return evaluate(bundleSource, bundleFilename, /* scope: */ null, /* includeGlobals: */ true)
 }
@@ -37,24 +38,32 @@ function evalBundle (stats) {
 export default function (source) {
   console.log('serving', source)
 
-  const config = configure({
+  const clientConfig = configure({
+    name: 'client',
+    target: 'web',
     buildDir: '/',
     siteRoot: path.resolve(__dirname, '../examples/blog')
   })
-  const compiler = webpack(config)
+  const serverConfig = configure({
+    name: 'server',
+    target: 'node',
+    buildDir: '/',
+    siteRoot: path.resolve(__dirname, '../examples/blog')
+  })
+  const compiler = webpack([clientConfig, serverConfig])
   const webpack$ = createWebpack$(compiler)
   // Create an observable which completes upon successful webpack build
   const webpackDone$ = webpack$.skipWhile(stats => !stats).take(1)
 
   const devMiddleware = webpackDevMiddleware(compiler, {
-    publicPath: config.output.publicPath,
+    publicPath: clientConfig.output.publicPath,
     stats: { chunkModules: false, colors: true }
   })
-  const hotMiddleware = webpackHotMiddleware(compiler)
+  // const hotMiddleware = webpackHotMiddleware(compiler)
 
   const app = express()
   app.use(devMiddleware)
-  app.use(hotMiddleware)
+  // app.use(hotMiddleware)
   app.use((req, res, next) => {
     console.log('waiting for webpack')
     webpackDone$.subscribe((stats) => {
