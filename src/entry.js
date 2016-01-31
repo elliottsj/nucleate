@@ -1,28 +1,52 @@
-import React from 'react'
-import { render } from 'react-dom'
-import { renderToString } from 'react-dom/server'
-import { browserHistory, match, Route, Router, RouterContext } from 'react-router'
+import React from 'react';
+import { render } from 'react-dom';
+import { renderToString } from 'react-dom/server';
+import { browserHistory, match, Route, Router, RouterContext } from 'react-router';
 
-const siteRoot = require(__NUCLEATE_ROOT__)
+const siteEntry = require(__NUCLEATE_ROOT__)
 
-function NoMatch () {
-  return <div>404: No matching route</div>
+function NoMatch() {
+  return <div>404: No matching route</div>;
 }
 
-const routes = (
-  <Route path='/' component={siteRoot.component}>
-    <Route path='*' component={NoMatch} />
-  </Route>
-)
+const noMatchRoute = {
+  path: '*',
+  component: NoMatch,
+};
+const rootRoute = {
+  ...siteEntry,
+  path: '/',
+  getChildRoutes: (location, callback) => {
+    siteEntry.getChildRoutes(location, (err, childRoutes) => {
+      callback(err, [...childRoutes, noMatchRoute]);
+    });
+  },
+};
 
-export function renderAll () {
+// In browser, render immediately
+if (typeof document !== 'undefined') {
+  const { pathname, search, hash } = window.location;
+  const location = `${pathname}${search}${hash}`;
+
+  // calling `match` is simply for side effects of
+  // loading route/component code for the initial location
+  // courtesy of https://github.com/rackt/example-react-router-server-rendering-lazy-routes
+  match({ routes: rootRoute, location }, () => {
+    render(
+      <Router history={browserHistory}>{rootRoute}</Router>,
+      document
+    );
+  });
+}
+
+export function renderAll() {
   throw new Error('renderAll is not yet implemented')
 }
 
-export function renderPath (path) {
+export function renderPath(path) {
   return new Promise((resolve, reject) => {
     console.log(`matching ${path}`)
-    match({ routes, location: path }, (error, redirectLocation, renderProps) => {
+    match({ routes: rootRoute, location: path }, (error, redirectLocation, renderProps) => {
       console.log(`matched ${path}`)
       if (error) {
         reject(error)
@@ -43,9 +67,4 @@ export function renderPath (path) {
       }
     })
   })
-}
-
-// In browser, render immediately
-if (typeof document !== 'undefined') {
-  render(<Router history={browserHistory}>{routes}</Router>, document)
 }

@@ -1,7 +1,7 @@
-import React from 'react'
+import React from 'react';
 
-export default function Assets () {
+export default function Assets() {
   return [
-    <script key='bundle' src='/assets/bundle.js'></script>
-  ]
+    <script key="bundle" defer src="/assets/client.bundle.js"></script>,
+  ];
 }

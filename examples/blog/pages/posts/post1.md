@@ -1,5 +1,6 @@
 ---
 title: Post 1
+layout: lib/layouts/Post
 date: 2016-01-19
 ---
 

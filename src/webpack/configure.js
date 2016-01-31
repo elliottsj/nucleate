@@ -1,52 +1,65 @@
-import webpack from 'webpack'
+import path from 'path';
+import webpack from 'webpack';
 
-const babelLoader = require.resolve('babel-loader')
-const combineLoader = require.resolve('combine-loader')
-const jsonLoader = require.resolve('json-loader')
-const frontMatterLoader = require.resolve('front-matter-loader')
-const htmlLoader = require.resolve('html-loader')
-const markdownItLoader = require.resolve('markdown-it-loader')
+const babelLoader = require.resolve('babel-loader');
+const combineLoader = require.resolve('combine-loader');
+const jsonLoader = require.resolve('json-loader');
+const frontMatterLoader = require.resolve('front-matter-loader');
+const htmlLoader = require.resolve('html-loader');
+const markdownItLoader = require.resolve('markdown-it-loader');
 
-export default function configure ({
-  buildDir,
+export default function configure({
+  outputPath,
   name,
-  siteRoot,
-  target
+  entry,
+  target,
 }) {
   return {
     name,
-    entry: require.resolve('../entry'),
+    entry: [
+      // require.resolve('webpack-hot-middleware/client'),
+      require.resolve('../entry'),
+    ],
     output: {
-      path: buildDir,
-      publicPath: '/assets',
-      filename: 'bundle.js',
+      path: outputPath,
+      publicPath: '/assets/',
+      filename: `${name}.bundle.js`,
       pathinfo: true,
-      libraryTarget: 'umd'
+      libraryTarget: 'umd',
     },
     target,
-    devtool: 'source-map',
+    devtool: 'inline-source-map',
     module: {
       loaders: [
-        { test: /\.js$/, include: siteRoot, loader: babelLoader },
+        { test: /\.jsx?$/, include: path.dirname(entry), loader: babelLoader },
         {
           test: /\.md$/,
-          include: siteRoot,
+          include: path.dirname(entry),
           loader: `${combineLoader}?${JSON.stringify({
             meta: [jsonLoader, `${frontMatterLoader}?onlyAttributes`],
-            content: [htmlLoader, markdownItLoader, `${frontMatterLoader}?onlyBody`]
-          })}`
-        }
-      ]
+            content: [htmlLoader, markdownItLoader, `${frontMatterLoader}?onlyBody`],
+          })}`,
+        },
+      ],
     },
     resolve: {
+      // TODO: remove this
       alias: {
-        'nucleate': require.resolve('..')
-      }
+        nucleate: path.resolve(__dirname, '..'),
+      },
+    },
+    resolveLoader: {
+      alias: {
+        route: require.resolve('./loaders/route'),
+      },
+      extensions: ['', '.js', '.jsx'],
     },
     plugins: [
       new webpack.DefinePlugin({
-        __NUCLEATE_ROOT__: JSON.stringify(siteRoot)
-      })
-    ]
-  }
+        __NUCLEATE_ROOT__: JSON.stringify(entry),
+      }),
+      new webpack.optimize.OccurenceOrderPlugin(),
+      // new webpack.HotModuleReplacementPlugin()
+    ],
+  };
 }
