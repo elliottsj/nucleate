@@ -27,7 +27,7 @@ export function createRoutesFromContext(context) {
     const mod = context(moduleName);
     return {
       ...createRoute(mod),
-      path: mod.path || path.basename(moduleName),
+      path: mod.path || path.basename(moduleName, path.extname(moduleName)),
     };
   });
 }

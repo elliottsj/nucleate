@@ -1,4 +1,6 @@
-import evaluate from 'eval';
+import createLogger from './utils/createLogger';
+const log = createLogger('serve');
+
 import express from 'express';
 import path from 'path';
 import Rx from 'rx-lite';
@@ -41,11 +43,12 @@ function requireBundle(stats) {
     stats.compilation.compiler.outputPath,
     stats.toJson().assetsByChunkName.main
   );
+  delete require.cache[require.resolve(bundlePath)];
   return require(bundlePath);
 }
 
 export default function (source) {
-  console.log('serving', source);
+  log.info(`serving ${source}`);
 
   const clientConfig = configure({
     name: 'client',
@@ -70,31 +73,31 @@ export default function (source) {
   const serverWebpack$ = createWebpack$(serverCompiler);
   // Create an observable which completes upon successful webpack build
   const serverWebpackDone$ = serverWebpack$.skipWhile(stats => !stats).take(1);
-  serverCompiler.run((err, stats) => {
-    console.log('server webpack completed');
+  serverCompiler.watch({}, (err, stats) => {
+    log.info('server webpack completed');
   });
 
   const app = express();
   app.use(devMiddleware);
   // app.use(hotMiddleware)
   app.use((req, res) => {
-    console.log('waiting for webpack');
+    log.info('waiting for webpack');
     serverWebpackDone$.subscribe((stats) => {
       const renderer = requireBundle(stats);
       renderer.renderPath(req.path).then((markup) => {
         res.send(markup);
       }).catch((error) => {
-        console.error(error.stack);
+        log.error(error.stack);
         res.status(500).type('text').send(error.stack);
       });
     }, () => {
-      console.error('error');
+      log.error('error rendering page using server bundle');
     }, () => {
-      console.log('completed');
+      log.info('completed page render');
     });
   });
 
   app.listen(3000, () => {
-    console.log('started listening on port %d', 3000);
+    log.info(`started listening on port ${3000}`);
   });
 }

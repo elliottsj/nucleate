@@ -57,6 +57,7 @@
     "json-loader": "^0.5.3",
     "loader-utils": "^0.2.12",
     "markdown-it-loader": "^0.2.0",
+    "npmlog": "^2.0.2",
     "nucleate-webpack-plugin": "^0.0.1",
     "react": "^0.14.6",
     "react-dom": "^0.14.6",
