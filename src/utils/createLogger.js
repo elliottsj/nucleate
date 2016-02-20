@@ -9,6 +9,9 @@ import log from 'npmlog';
  */
 export default function createLogger(prefix) {
   return {
+    log: (level, message, ...args) => {
+      log.log(level, /* no prefix */ '', message, ...args);
+    },
     silly: log.silly.bind(prefix),
     verbose: log.verbose.bind(prefix),
     info: log.info.bind(prefix),
