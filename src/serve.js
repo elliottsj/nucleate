@@ -9,6 +9,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 // TODO: fix https://github.com/glenjamin/webpack-hot-middleware/issues/18
 // import webpackHotMiddleware from 'webpack-hot-middleware'
 
+import requireInChild from './utils/requireInChild';
 import configure from './webpack/configure';
 
 /**
@@ -29,22 +30,11 @@ function createWebpack$(compiler) {
   return webpack$;
 }
 
-// function evalBundle(stats) {
-//   debugger
-//   const bundleFilenames = stats.toJson().children.find(c => c.name === 'server').assetsByChunkName['main'];
-//   const bundleFilename = Array.isArray(bundleFilenames) ? bundleFilenames[0] : bundleFilenames;
-//   const bundleAsset = stats.stats.find(s => s.compilation.name === 'server').compilation.assets[bundleFilename];
-//   const bundleSource = bundleAsset.source();
-//   return evaluate(bundleSource, bundleFilename, /* scope: */ null, /* includeGlobals: */ true)
-// }
-
-function requireBundle(stats) {
-  const bundlePath = path.resolve(
+function getBundlePath(stats) {
+  return path.resolve(
     stats.compilation.compiler.outputPath,
     stats.toJson().assetsByChunkName.main
   );
-  delete require.cache[require.resolve(bundlePath)];
-  return require(bundlePath);
 }
 
 export default function (source) {
@@ -75,6 +65,7 @@ export default function (source) {
   const serverWebpackDone$ = serverWebpack$.skipWhile(stats => !stats).take(1);
   serverCompiler.watch({}, (err, stats) => {
     log.info('server webpack completed');
+    log.log('info', stats.toString({ chunkModules: false, colors: true }));
   });
 
   const app = express();
@@ -83,8 +74,9 @@ export default function (source) {
   app.use((req, res) => {
     log.info('waiting for webpack');
     serverWebpackDone$.subscribe((stats) => {
-      const renderer = requireBundle(stats);
-      renderer.renderPath(req.path).then((markup) => {
+      const bundlePath = getBundlePath(stats);
+      const bundleProxy = requireInChild(bundlePath);
+      bundleProxy.callAsyncMethod('renderPath', req.path).then((markup) => {
         res.send(markup);
       }).catch((error) => {
         log.error(error.stack);
