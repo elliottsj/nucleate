@@ -28,7 +28,7 @@ export default function configure({
       libraryTarget: 'umd',
     },
     target,
-    devtool: 'inline-source-map',
+    devtool: 'eval',
     module: {
       loaders: [
         { test: /\.jsx?$/, include: path.dirname(entry), loader: babelLoader },
