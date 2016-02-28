@@ -12,6 +12,8 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import requireInChild from './utils/requireInChild';
 import configure from './webpack/configure';
 
+const { BUNDLE_ARGV } = process.env;
+
 /**
  * Create a hot observable which emits `null` when the webpack build is in
  * progress, and emits the webpack `stats` object when the build is completed.
@@ -75,10 +77,13 @@ export default function (source) {
     log.info('waiting for webpack');
     serverWebpackDone$.subscribe((stats) => {
       const bundlePath = getBundlePath(stats);
-      const bundleProxy = requireInChild(bundlePath);
+      const bundleProxy = requireInChild(bundlePath, BUNDLE_ARGV);
       bundleProxy.callAsyncMethod('renderPath', req.path).then((markup) => {
+        log.info(`rendered ${req.path}`);
+        bundleProxy.kill();
         res.send(markup);
       }).catch((error) => {
+        bundleProxy.kill();
         log.error(error.stack);
         res.status(500).type('text').send(error.stack);
       });

@@ -1,6 +1,7 @@
 import createLogger from './createLogger';
 const log = createLogger('requireInChild');
 
+import split from 'argv-split';
 import childProcess from 'child_process';
 import path from 'path';
 
@@ -14,8 +15,20 @@ function once(cp, messageType, done) {
   cp.on('message', listener);
 }
 
-export default function requireInChild(modulePath) {
-  const cp = childProcess.fork(path.resolve(__dirname, './child'));
+export default function requireInChild(modulePath, argv = '') {
+  const cp = childProcess.fork(path.resolve(__dirname, './child'), [], {
+    execArgv: split(argv),
+  });
+
+  const childReady = new Promise((resolve) => {
+    once(cp, 'READY', () => {
+      cp.send({
+        type: 'REQUIRE_MODULE',
+        payload: modulePath,
+      });
+      resolve();
+    });
+  });
 
   cp.on('message', (message) => {
     if (message.type === 'ERROR') {
@@ -24,21 +37,23 @@ export default function requireInChild(modulePath) {
     }
   });
 
-  cp.send({
-    type: 'REQUIRE_MODULE',
-    payload: modulePath,
-  });
-
   function callAsyncMethod(methodName, ...args) {
-    return new Promise((resolve, reject) => {
+    return childReady.then(() => new Promise((resolve, reject) => {
       once(cp, 'ASYNC_METHOD_RESULT', payload => resolve(payload));
       once(cp, 'ASYNC_METHOD_ERROR', payload => reject(payload));
       cp.send({
         type: 'CALL_ASYNC_METHOD',
         payload: { methodName, args },
       });
-    });
+    }));
   }
 
-  return { callAsyncMethod };
+  function kill() {
+    cp.kill();
+  }
+
+  return {
+    callAsyncMethod,
+    kill,
+  };
 }

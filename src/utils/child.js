@@ -39,3 +39,7 @@ process.on('message', (message) => {
       raise(new Error(`Invalid message type: ${message.type}`));
   }
 });
+
+process.send({
+  type: 'READY',
+});

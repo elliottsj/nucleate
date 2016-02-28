@@ -1,7 +1,14 @@
+import 'babel-polyfill';
+
 import React from 'react';
 import { render } from 'react-dom';
 import { renderToString } from 'react-dom/server';
 import { browserHistory, match, Router, RouterContext } from 'react-router';
+
+import { resolveComponentsQueries } from './query';
+import QueryContext from './components/QueryContext';
+
+import Children from './components/Children';
 
 const siteEntry = require(__NUCLEATE_ROOT__);
 
@@ -13,7 +20,7 @@ const noMatchRoute = {
   path: '*',
   component: NoMatch,
 };
-const rootRoute = {
+const routes = {
   ...siteEntry,
   path: '/',
   getChildRoutes: (location, callback) => {
@@ -23,45 +30,75 @@ const rootRoute = {
   },
 };
 
+function renderToDocument(location) {
+  // calling `match` is simply for side effects of
+  // loading route/component code for the initial location
+  // courtesy of https://github.com/ryanflorence/example-react-router-server-rendering-lazy-routes
+  match({ routes, location }, (error, redirectLocation, renderProps) => {
+    if (redirectLocation) {
+      renderToDocument(redirectLocation);
+    } else {
+      resolveComponentsQueries(routes, renderProps.components).then((resolvedQueries) => {
+        render(
+          <QueryContext resolvedQueries={resolvedQueries}>
+            <Router history={browserHistory}>{routes}</Router>
+          </QueryContext>,
+          document
+        );
+      });
+    }
+  });
+}
+
 // In browser, render immediately
 if (typeof document !== 'undefined') {
   const { pathname, search, hash } = window.location;
   const location = `${pathname}${search}${hash}`;
 
-  // calling `match` is simply for side effects of
-  // loading route/component code for the initial location
-  // courtesy of https://github.com/rackt/example-react-router-server-rendering-lazy-routes
-  match({ routes: rootRoute, location }, () => {
-    render(
-      <Router history={browserHistory}>{rootRoute}</Router>,
-      document
-    );
-  });
+  renderToDocument(location);
 }
 
 export function renderAll() {
   throw new Error('renderAll is not yet implemented');
 }
 
-export function renderPath(path) {
+export function renderPath(location) {
   return new Promise((resolve, reject) => {
-    console.log(`matching ${path}`);
-    match({ routes: rootRoute, location: path }, (error, redirectLocation, renderProps) => {
-      console.log(`matched ${path}`);
+    console.log(`matching ${location}`);
+    match({ routes, location }, (error, redirectLocation, renderProps) => {
+      console.log(`matched ${location}`);
       if (error) {
         reject(error);
       } else if (redirectLocation) {
-        reject(new Error(
-          `TODO: re-match using redirect path (${redirectLocation.pathname})` +
-          ` and render destination page`
-        ));
+        // Re-match using redirect path and render destination page
+        renderPath(redirectLocation).then(resolve, reject);
       } else if (renderProps) {
-        try {
-          resolve(`<!DOCTYPE html>${renderToString(<RouterContext {...renderProps} />)}`);
-        } catch (e) {
-          // TODO: render a basic page for browser debugging?
-          reject(e);
-        }
+        resolveComponentsQueries(routes, renderProps.components).then((resolvedQueries) => {
+          debugger
+          try {
+            resolve(
+              `<!DOCTYPE html>${
+                // renderToString(
+                //   <Children>
+                //     <RouterContext {...renderProps} />
+                //   </Children>
+                // )
+                renderToString(
+                  <QueryContext resolvedQueries={resolvedQueries}>
+                    <RouterContext {...renderProps} />
+                  </QueryContext>
+                )
+              }`
+            );
+          } catch (e) {
+            // TODO: render a basic page for browser debugging?
+            // 1. Render a bare html page at '/server_error?destination=<path>'
+            //    with links to assets and an empty <body>
+            // 2. After initial render, immediately navigate to `destination`
+            // 3. User can then debug their error
+            reject(e);
+          }
+        });
       } else {
         reject(new Error('TODO: handle top-level 404'));
       }

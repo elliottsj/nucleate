@@ -7,8 +7,8 @@ import {
 
 export const getIndexRoute = (location, callback) => {
   require.ensure([], (require) => {
-    const childRoutes = createRoute(require('./pages/index.jsx'));
-    callback(null, childRoutes);
+    const indexRoute = createRoute(require('./pages/index.jsx'));
+    callback(null, indexRoute);
   });
 };
 
