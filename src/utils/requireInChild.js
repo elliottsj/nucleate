@@ -1,7 +1,6 @@
 import createLogger from './createLogger';
 const log = createLogger('requireInChild');
 
-import split from 'argv-split';
 import childProcess from 'child_process';
 import path from 'path';
 
@@ -15,10 +14,8 @@ function once(cp, messageType, done) {
   cp.on('message', listener);
 }
 
-export default function requireInChild(modulePath, argv = '') {
-  const cp = childProcess.fork(path.resolve(__dirname, './child'), [], {
-    execArgv: split(argv),
-  });
+export default function requireInChild(modulePath, execArgv = []) {
+  const cp = childProcess.fork(path.resolve(__dirname, './child'), [], { execArgv });
 
   const childReady = new Promise((resolve) => {
     once(cp, 'READY', () => {

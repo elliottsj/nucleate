@@ -1,21 +1,9 @@
 import {
   Children,
-  createRoute,
-  createRoutesFromContext,
+  includeRoute,
+  includeRoutes,
 } from 'nucleate';
 
-export const getIndexRoute = (location, callback) => {
-  require.ensure([], (require) => {
-    const indexRoute = createRoute(require('./posts/index.jsx'));
-    callback(null, indexRoute);
-  });
-};
-
-export const getChildRoutes = (location, callback) => {
-  require.ensure([], (require) => {
-    const childRoutes = createRoutesFromContext(require.context('./posts', false));
-    callback(null, childRoutes);
-  });
-};
-
+export const getIndexRoute = includeRoute(require('route!./posts/'));
+export const getChildRoutes = includeRoutes(require.context('route!./posts/', false));
 export const component = Children;

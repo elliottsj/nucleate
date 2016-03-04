@@ -12,6 +12,12 @@ export {
 import memoize from 'memoize-id';
 import path from 'path';
 import React from 'react';
+import {
+  filter,
+  reduce,
+} from 'wu';
+import invertMap from './utils/invertMap';
+import resolvePromiseMap from './utils/resolvePromiseMap';
 
 function createHtmlComponent(html) {
   return function HtmlFragment() {
@@ -40,11 +46,44 @@ function plainBasename(moduleName) {
   return path.basename(moduleName, path.extname(moduleName));
 }
 
-export function createRoutesFromContext(context) {
-  return context.keys().filter(
-    moduleName => plainBasename(moduleName) !== 'index'
-  ).map((moduleName) => {
-    const mod = context(moduleName);
-    return createRoute(mod, plainBasename(moduleName));
-  });
+function dedupeModuleMap(moduleMap) {
+  const uniqModuleMap = reduce(
+    (uniq, [moduleName, mod]) =>
+      (!uniq.has(mod) || moduleName < uniq.get(mod).length)
+        ? uniq.set(mod, moduleName)
+        : uniq,
+    new Map(),
+    moduleMap
+  );
+
+  return invertMap(uniqModuleMap);
+}
+
+function createRoutesFromMap(moduleMap) {
+  const nonIndexModuleMap = filter(
+    ([moduleName]) => plainBasename(moduleName) !== 'index',
+    moduleMap
+  );
+  const uniqModuleMap = dedupeModuleMap(nonIndexModuleMap);
+  return [...uniqModuleMap].map(
+    ([moduleName, mod]) => createRoute(mod, plainBasename(moduleName))
+  );
+}
+
+export function includeRoute(loadModule) {
+  return (location, callback) => {
+    loadModule().then(mod => callback(null, mod));
+  };
+}
+
+export function includeRoutes(context) {
+  const loadModules = () => resolvePromiseMap(new Map(
+    context.keys().map(moduleName => [moduleName, context(moduleName)()])
+  ));
+
+  return async (location, callback) => {
+    const moduleMap = await loadModules();
+    const routes = createRoutesFromMap(moduleMap);
+    callback(null, routes);
+  };
 }

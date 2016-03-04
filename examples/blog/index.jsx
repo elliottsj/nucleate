@@ -1,23 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import {
   Assets,
-  createRoute,
-  createRoutesFromContext,
+  includeRoute,
+  includeRoutes,
 } from 'nucleate';
 
-export const getIndexRoute = (location, callback) => {
-  require.ensure([], (require) => {
-    const indexRoute = createRoute(require('./pages/index.jsx'));
-    callback(null, indexRoute);
-  });
-};
-
-export const getChildRoutes = (location, callback) => {
-  require.ensure([], (require) => {
-    const childRoutes = createRoutesFromContext(require.context('./pages', false));
-    callback(null, childRoutes);
-  });
-};
+export const getIndexRoute = includeRoute(require('route!./pages/'));
+export const getChildRoutes = includeRoutes(require.context('route!./pages/', false));
 
 export class component extends Component {
   static propTypes = {
@@ -41,7 +30,7 @@ export class component extends Component {
       </html>
     );
   }
-}
+};
 
 // ({
 //   path: '/',

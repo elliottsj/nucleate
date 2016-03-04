@@ -1,9 +1,10 @@
 import createLogger from './utils/createLogger';
 const log = createLogger('serve');
 
+import split from 'argv-split';
 import express from 'express';
 import path from 'path';
-import Rx from 'rx-lite';
+import Rx from 'rxjs/Rx';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 // TODO: fix https://github.com/glenjamin/webpack-hot-middleware/issues/18
@@ -12,7 +13,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import requireInChild from './utils/requireInChild';
 import configure from './webpack/configure';
 
-const { BUNDLE_ARGV } = process.env;
+const BUNDLE_ARGV = split(process.env.BUNDLE_ARGV || '');
 
 /**
  * Create a hot observable which emits `null` when the webpack build is in
@@ -24,10 +25,10 @@ const { BUNDLE_ARGV } = process.env;
  */
 function createWebpack$(compiler) {
   const webpack$ = Rx.Observable.create((observer) => {
-    compiler.plugin('invalid', () => observer.onNext(null));
-    compiler.plugin('failed', err => observer.onError(err));
-    compiler.plugin('done', stats => observer.onNext(stats));
-  }).replay(null, 1);
+    compiler.plugin('invalid', () => observer.next(null));
+    compiler.plugin('failed', err => observer.error(err));
+    compiler.plugin('done', stats => observer.next(stats));
+  }).publishReplay(1);
   webpack$.connect();
   return webpack$;
 }
@@ -40,18 +41,19 @@ function getBundlePath(stats) {
 }
 
 export default function (source) {
-  log.info(`serving ${source}`);
+  const entry = path.resolve(source);
+  log.info(`serving ${entry}`);
 
   const clientConfig = configure({
+    entry,
     name: 'client',
     outputPath: '/',
-    entry: path.resolve(__dirname, '../examples/blog/index.jsx'),
     target: 'web',
   });
   const serverConfig = configure({
+    entry,
     name: 'server',
     outputPath: path.resolve(__dirname, '../build'),
-    entry: path.resolve(__dirname, '../examples/blog/index.jsx'),
     target: 'node',
   });
   const clientCompiler = webpack(clientConfig);

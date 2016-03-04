@@ -8,8 +8,6 @@ import { browserHistory, match, Router, RouterContext } from 'react-router';
 import { resolveComponentsQueries } from './query';
 import QueryContext from './components/QueryContext';
 
-import Children from './components/Children';
-
 const siteEntry = require(__NUCLEATE_ROOT__);
 
 function NoMatch() {
@@ -78,11 +76,6 @@ export function renderPath(location) {
           try {
             resolve(
               `<!DOCTYPE html>${
-                // renderToString(
-                //   <Children>
-                //     <RouterContext {...renderProps} />
-                //   </Children>
-                // )
                 renderToString(
                   <QueryContext resolvedQueries={resolvedQueries}>
                     <RouterContext {...renderProps} />

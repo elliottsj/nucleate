@@ -47,18 +47,15 @@ export default function configure({
       alias: {
         nucleate: path.resolve(__dirname, '..'),
       },
+      extensions: ['', '.js', '.jsx'],
     },
     resolveLoader: {
-      alias: {
-        route: require.resolve('./loaders/route'),
-      },
-      extensions: ['', '.js', '.jsx'],
+      fallback: path.resolve(__dirname, './loaders'),
     },
     plugins: [
       new webpack.DefinePlugin({
         __NUCLEATE_ROOT__: JSON.stringify(entry),
       }),
-      new webpack.optimize.OccurenceOrderPlugin(),
       // new webpack.HotModuleReplacementPlugin()
     ],
   };
