@@ -71,9 +71,11 @@ function createRoutesFromMap(moduleMap) {
 }
 
 export function includeRoute(loadModule) {
-  return (location, callback) => {
-    loadModule().then(mod => callback(null, mod));
-  };
+  // Memoize with async: 'immediate' so the cached route is synchronously available
+  // to react-router upon rendering
+  return memoize(async (location, callback) => {
+    callback(null, await loadModule());
+  }, { arity: 0, async: 'immediate' });
 }
 
 export function includeRoutes(context) {
@@ -81,9 +83,10 @@ export function includeRoutes(context) {
     context.keys().map(moduleName => [moduleName, context(moduleName)()])
   ));
 
-  return async (location, callback) => {
+  // Memoize with async: 'immediate' so the cached route is synchronously available
+  // to react-router upon rendering
+  return memoize(async (location, callback) => {
     const moduleMap = await loadModules();
-    const routes = createRoutesFromMap(moduleMap);
-    callback(null, routes);
-  };
+    callback(null, createRoutesFromMap(moduleMap));
+  }, { arity: 0, async: 'immediate' });
 }

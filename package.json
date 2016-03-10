@@ -77,7 +77,7 @@
     "json-loader": "^0.5.4",
     "loader-utils": "^0.2.12",
     "markdown-it-loader": "^0.2.0",
-    "memoize-id": "^0.1.1",
+    "memoize-id": "^0.2.0",
     "npmlog": "^2.0.2",
     "nucleate-webpack-plugin": "^0.0.1",
     "pify": "^2.3.0",
