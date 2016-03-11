@@ -5,6 +5,7 @@ import { render } from 'react-dom';
 import { renderToString } from 'react-dom/server';
 import { browserHistory, match, Router, RouterContext } from 'react-router';
 
+import { createRoute } from '.';
 import { resolveComponentsQueries } from './query';
 import QueryContext from './components/QueryContext';
 
@@ -18,15 +19,7 @@ const noMatchRoute = {
   path: '*',
   component: NoMatch,
 };
-const routes = {
-  ...siteEntry,
-  path: '/',
-  getChildRoutes: (location, callback) => {
-    siteEntry.getChildRoutes(location, (err, childRoutes) => {
-      callback(err, [...childRoutes, noMatchRoute]);
-    });
-  },
-};
+const routes = createRoute(siteEntry, '/', [noMatchRoute]);
 
 function renderToDocument(location) {
   // calling `match` is simply for side effects of

@@ -43,15 +43,38 @@ function createMarkdownComponent(markdown) {
  * XXX: this function must be memoized, otherwise `getIndexRoute()` / `getChildRoutes()`
  * will return a *new* PlainRoute, which causes `isIndexRoute` to fail.
  *
- * @param  {Object} mod         Module object
- * @param  {String} [routePath] Optional path which will be used as a fallback for `mod.path`
- * @return {PlainRoute}         A react-router PlainRoute
+ * @param  {Object} mod
+ *   Module object
+ * @param  {String} [routePath]
+ *   Optional path which will be used as a fallback for `mod.path`
+ * @param  {Array<PlainRoute>}
+ *   Optional additional routes to be appended to the module's child routes
+ * @return {PlainRoute}
+ *   A react-router PlainRoute
  */
-export const createRoute = memoize((mod, routePath) => ({
-  ...mod,
-  component: mod.component || (mod.markdown && createMarkdownComponent(mod.markdown)),
-  path: mod.path || routePath,
-}));
+export const createRoute = memoize((mod, routePath, moreChildRoutes = []) => {
+  // Memoize route getters with async: 'immediate' so the cached route is synchronously available
+  // to react-router upon rendering
+  const getIndexRoute = (
+    mod.getIndexRoute && memoize(mod.getIndexRoute, { arity: 0, async: 'immediate' })
+  );
+  const getChildRoutes = (
+    mod.getChildRoutes && memoize(
+      (location, callback) => mod.getChildRoutes(location, (error, childRoutes) => {
+        callback(error, [...childRoutes, ...moreChildRoutes]);
+      }),
+      { arity: 0, async: 'immediate' }
+    )
+  );
+
+  return ({
+    ...mod,
+    component: mod.component || (mod.markdown && createMarkdownComponent(mod.markdown)),
+    getIndexRoute,
+    getChildRoutes,
+    path: mod.path || routePath,
+  });
+});
 
 function plainBasename(moduleName) {
   return path.basename(moduleName, path.extname(moduleName));
@@ -82,11 +105,9 @@ function createRoutesFromMap(moduleMap) {
 }
 
 export function includeRoute(loadModule) {
-  // Memoize with async: 'immediate' so the cached route is synchronously available
-  // to react-router upon rendering
-  return memoize(async (location, callback) => {
+  return async (location, callback) => {
     callback(null, await loadModule());
-  }, { arity: 0, async: 'immediate' });
+  };
 }
 
 export function includeRoutes(context) {
@@ -94,10 +115,8 @@ export function includeRoutes(context) {
     context.keys().map(moduleName => [moduleName, context(moduleName)()])
   ));
 
-  // Memoize with async: 'immediate' so the cached route is synchronously available
-  // to react-router upon rendering
-  return memoize(async (location, callback) => {
+  return async (location, callback) => {
     const moduleMap = await loadModules();
     callback(null, createRoutesFromMap(moduleMap));
-  }, { arity: 0, async: 'immediate' });
+  };
 }
