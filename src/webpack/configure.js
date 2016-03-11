@@ -4,9 +4,7 @@ import webpack from 'webpack';
 const babelLoader = require.resolve('babel-loader');
 const combineLoader = require.resolve('combine-loader');
 const frontMatterLoader = require.resolve('front-matter-loader');
-const htmlLoader = require.resolve('html-loader');
 const jsonLoader = require.resolve('json-loader');
-const markdownItLoader = require.resolve('markdown-it-loader');
 const rawLoader = require.resolve('raw-loader');
 
 export default function configure({
@@ -49,14 +47,6 @@ export default function configure({
             markdown: [rawLoader, `${frontMatterLoader}?onlyBody`],
           })}`,
         },
-        // {
-        //   test: /\.md$/,
-        //   include: path.dirname(entry),
-        //   loader: `${combineLoader}?${JSON.stringify({
-        //     meta: [jsonLoader, `${frontMatterLoader}?onlyAttributes`],
-        //     content: [htmlLoader, markdownItLoader, `${frontMatterLoader}?onlyBody`],
-        //   })}`,
-        // },
       ],
     },
     resolve: {
