@@ -5,6 +5,6 @@
     "jest": true
   },
   "globals": {
-    __NUCLEATE_ROOT__: true
+    __SITE_ENTRY__: true
   }
 }

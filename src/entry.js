@@ -8,7 +8,7 @@ import { browserHistory, match, Router, RouterContext } from 'react-router';
 import { resolveComponentsQueries } from './query';
 import QueryContext from './components/QueryContext';
 
-const siteEntry = require(__NUCLEATE_ROOT__);
+const siteEntry = require(__SITE_ENTRY__);
 
 function NoMatch() {
   return <div>404: No matching route</div>;

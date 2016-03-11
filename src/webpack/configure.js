@@ -71,7 +71,7 @@ export default function configure({
     },
     plugins: [
       new webpack.DefinePlugin({
-        __NUCLEATE_ROOT__: JSON.stringify(entry),
+        __SITE_ENTRY__: JSON.stringify(entry),
       }),
       // new webpack.HotModuleReplacementPlugin()
     ],
