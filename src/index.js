@@ -1,4 +1,16 @@
-export { Link } from 'react-router';
+import memoize from 'memoize-id';
+import path from 'path';
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Link } from 'react-router';
+import {
+  filter,
+  reduce,
+} from 'wu';
+import invertMap from './utils/invertMap';
+import resolvePromiseMap from './utils/resolvePromiseMap';
+
+export { Link };
 export { default as Assets } from './components/Assets';
 export { default as Children } from './components/Children';
 export { default as query } from './components/query';
@@ -9,19 +21,18 @@ export {
   resolveQueries,
 } from './query';
 
-import memoize from 'memoize-id';
-import path from 'path';
-import React from 'react';
-import {
-  filter,
-  reduce,
-} from 'wu';
-import invertMap from './utils/invertMap';
-import resolvePromiseMap from './utils/resolvePromiseMap';
-
-function createHtmlComponent(html) {
-  return function HtmlFragment() {
-    return <div dangerouslySetInnerHTML={{ __html: html }} />;
+function createMarkdownComponent(markdown) {
+  return function MarkdownPage() {
+    return (
+      <ReactMarkdown
+        source={markdown}
+        renderers={{
+          Link: props => /^~/.test(props.href)
+            ? <Link to={props.href.replace(/^~/, '')} {...props} />
+            : 'a',
+        }}
+      />
+    );
   };
 }
 
@@ -29,7 +40,7 @@ function createHtmlComponent(html) {
  * Create a react-router PlainRoute from the given module and optional routePath.
  * Memoized to ensure at most one PlainRoute is created per module.
 
- * XXX: if this function is not memoized, `getIndexRoute()` / `getChildRoutes()`
+ * XXX: this function must be memoized, otherwise `getIndexRoute()` / `getChildRoutes()`
  * will return a *new* PlainRoute, which causes `isIndexRoute` to fail.
  *
  * @param  {Object} mod         Module object
@@ -38,7 +49,7 @@ function createHtmlComponent(html) {
  */
 export const createRoute = memoize((mod, routePath) => ({
   ...mod,
-  component: mod.component || (mod.content && createHtmlComponent(mod.content)),
+  component: mod.component || (mod.markdown && createMarkdownComponent(mod.markdown)),
   path: mod.path || routePath,
 }));
 
