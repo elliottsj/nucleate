@@ -1,6 +1,9 @@
+import 'lib/css/poole.css';
+import 'lib/css/hyde.css';
+
 import React, { Component, PropTypes } from 'react';
 import {
-  Assets,
+  assets,
   includeRoute,
   includeRoutes,
 } from 'nucleate';
@@ -20,9 +23,7 @@ export const component = class Index extends Component {
       <html>
         <head>
           <title>Blog</title>
-          {
-            Assets() // eslint-disable-line new-cap
-          }
+          {assets()}
         </head>
         <body>
           {children}

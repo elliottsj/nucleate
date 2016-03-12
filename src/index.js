@@ -11,7 +11,7 @@ import invertMap from './utils/invertMap';
 import resolvePromiseMap from './utils/resolvePromiseMap';
 
 export { Link };
-export { default as Assets } from './components/Assets';
+export { default as assets } from './components/assets';
 export { default as Children } from './components/Children';
 export { default as query } from './components/query';
 export { default as QueryContext } from './components/QueryContext';

@@ -1,8 +1,11 @@
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import fs from 'fs';
 import path from 'path';
 import webpack from 'webpack';
 
 const babelLoader = require.resolve('babel-loader');
 const combineLoader = require.resolve('combine-loader');
+const cssLoader = require.resolve('css-loader');
 const frontMatterLoader = require.resolve('front-matter-loader');
 const jsonLoader = require.resolve('json-loader');
 const rawLoader = require.resolve('raw-loader');
@@ -13,6 +16,10 @@ export default function configure({
   entry,
   target,
 }) {
+  const entryDir = fs.statSync(path.dirname(entry)).isDirectory()
+    ? entry
+    : path.dirname(entry);
+
   return {
     name,
     entry: [
@@ -31,8 +38,13 @@ export default function configure({
     module: {
       loaders: [
         {
+          test: /\.css$/,
+          include: entryDir,
+          loader: ExtractTextPlugin.extract(cssLoader),
+        },
+        {
           test: /\.jsx?$/,
-          include: path.dirname(entry),
+          include: entryDir,
           loader: babelLoader,
         },
         {
@@ -41,7 +53,7 @@ export default function configure({
         },
         {
           test: /\.md$/,
-          include: path.dirname(entry),
+          include: entryDir,
           loader: `${combineLoader}?${JSON.stringify({
             meta: [jsonLoader, `${frontMatterLoader}?onlyAttributes`],
             markdown: [rawLoader, `${frontMatterLoader}?onlyBody`],
@@ -54,6 +66,7 @@ export default function configure({
       alias: {
         nucleate: path.resolve(__dirname, '..'),
       },
+      root: entryDir,
       extensions: ['', '.js', '.jsx'],
     },
     resolveLoader: {
@@ -63,6 +76,7 @@ export default function configure({
       new webpack.DefinePlugin({
         __SITE_ENTRY__: JSON.stringify(entry),
       }),
+      new ExtractTextPlugin(`${name}.bundle.css`, { allChunks: true }),
       // new webpack.HotModuleReplacementPlugin()
     ],
   };

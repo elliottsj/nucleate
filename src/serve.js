@@ -34,9 +34,10 @@ function createWebpack$(compiler) {
 }
 
 function getBundlePath(stats) {
+  const mainAssets = stats.toJson().assetsByChunkName.main;
   return path.resolve(
     stats.compilation.compiler.outputPath,
-    stats.toJson().assetsByChunkName.main
+    Array.isArray(mainAssets) ? mainAssets[0] : mainAssets
   );
 }
 
