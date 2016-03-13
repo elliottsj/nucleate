@@ -68,6 +68,6 @@ async function resolveQueries(routes, component) {
 
 export async function resolveComponentsQueries(routes, components) {
   return new Map(await Promise.all(components.map(
-    async component => await [component, await resolveQueries(routes, component)]
+    async component => [component, await resolveQueries(routes, component)]
   )));
 }

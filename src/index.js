@@ -67,13 +67,13 @@ export const createRoute = memoize((mod, routePath, moreChildRoutes = []) => {
     )
   );
 
-  return ({
+  return {
     ...mod,
     component: mod.component || (mod.markdown && createMarkdownComponent(mod.markdown)),
     getIndexRoute,
     getChildRoutes,
     path: mod.path || routePath,
-  });
+  };
 });
 
 function plainBasename(moduleName) {
