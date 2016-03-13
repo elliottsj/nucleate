@@ -7,6 +7,7 @@ import {
   includeRoute,
   includeRoutes,
 } from 'nucleate';
+import Sidebar from 'lib/components/Sidebar';
 
 export const getIndexRoute = includeRoute(require('route!./pages/'));
 export const getChildRoutes = includeRoutes(require.context('route!./pages/', false));
@@ -26,7 +27,10 @@ export const component = class Index extends Component {
           {assets()}
         </head>
         <body>
-          {children}
+          <Sidebar />
+          <div className="content container">
+            {children}
+          </div>
         </body>
       </html>
     );

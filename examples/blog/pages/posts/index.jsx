@@ -7,27 +7,23 @@ import {
 
 class PostsIndex extends Component {
   static propTypes = {
-    children: PropTypes.node,
     posts: PropTypes.array.isRequired,
     routes: PropTypes.array.isRequired,
   };
 
   render() {
-    const { children, posts } = this.props;
+    const { posts } = this.props;
 
     return (
-      <div className="home">
-        <ul className="post-list">
-          {posts.map(post => (
-            <li key={post.path}>
-              <span className="post-meta">
-                {post.meta.date}
-              </span>
-              <Link className="post-link" to={post.fullpath}>{post.meta.title}</Link>
-            </li>
-          ))}
-        </ul>
-        {children}
+      <div className="posts">
+        {posts.map(post => (
+          <div key={post.path} className="post">
+            <h1 className="post-title">
+              <Link to={post.fullpath}>{post.meta.title}</Link>
+            </h1>
+            <span className="post-date">{post.meta.date}</span>
+          </div>
+        ))}
       </div>
     );
   }

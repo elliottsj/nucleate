@@ -10,6 +10,8 @@ const frontMatterLoader = require.resolve('front-matter-loader');
 const jsonLoader = require.resolve('json-loader');
 const rawLoader = require.resolve('raw-loader');
 
+const layoutLoader = require.resolve('./loaders/layout-loader');
+
 export default function configure({
   outputPath,
   name,
@@ -55,6 +57,7 @@ export default function configure({
           test: /\.md$/,
           include: entryDir,
           loader: `${combineLoader}?${JSON.stringify({
+            layout: [layoutLoader, jsonLoader, `${frontMatterLoader}?onlyAttributes`],
             meta: [jsonLoader, `${frontMatterLoader}?onlyAttributes`],
             markdown: [rawLoader, `${frontMatterLoader}?onlyBody`],
           })}`,

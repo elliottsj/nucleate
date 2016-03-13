@@ -7,6 +7,7 @@ import {
   filter,
   reduce,
 } from 'wu';
+import Children from './components/Children';
 import invertMap from './utils/invertMap';
 import resolvePromiseMap from './utils/resolvePromiseMap';
 
@@ -21,17 +22,19 @@ export {
   resolveQueries,
 } from './query';
 
-function createMarkdownComponent(markdown) {
+function createMarkdownComponent(Layout = Children, meta, markdown) {
   return function MarkdownPage() {
     return (
-      <ReactMarkdown
-        source={markdown}
-        renderers={{
-          Link: props => /^~/.test(props.href)
-            ? <Link to={props.href.replace(/^~/, '')} {...props} />
-            : 'a',
-        }}
-      />
+      <Layout {...meta}>
+        <ReactMarkdown
+          source={markdown}
+          renderers={{
+            Link: props => /^~/.test(props.href)
+              ? <Link to={props.href.replace(/^~/, '')} {...props} />
+              : 'a',
+          }}
+        />
+      </Layout>
     );
   };
 }
@@ -69,7 +72,7 @@ export const createRoute = memoize((mod, routePath, moreChildRoutes = []) => {
 
   return {
     ...mod,
-    component: mod.component || (mod.markdown && createMarkdownComponent(mod.markdown)),
+    component: mod.component || (mod.markdown && createMarkdownComponent(mod.layout, mod.meta, mod.markdown)),
     getIndexRoute,
     getChildRoutes,
     path: mod.path || routePath,
