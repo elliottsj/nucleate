@@ -25,6 +25,6 @@ program
   .description(
     'Build site from the given source directory, optionally specifying a destination directory'
   )
-  .action((source, destination) => build(source, destination));
+  .action((source, destination = './build') => build(source, destination));
 
 program.parse(process.argv);

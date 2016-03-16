@@ -1,9 +1,11 @@
 import 'babel-polyfill';
 
+import pify from 'pify';
 import React from 'react';
 import { render } from 'react-dom';
 import { renderToString } from 'react-dom/server';
 import { browserHistory, match, Router, RouterContext } from 'react-router';
+import urljoin from 'url-join';
 
 import { createRoute } from '.';
 import { resolveComponentsQueries } from './query';
@@ -49,8 +51,20 @@ if (typeof document !== 'undefined') {
   renderToDocument(location);
 }
 
-export function renderAll() {
-  throw new Error('renderAll is not yet implemented');
+async function collectRoutePaths(prefix, route): Promise<Array<string>> {
+  const routePath = urljoin(prefix, route.path);
+  if (/\*|:|\(|\)/.test(routePath)) {
+    return [];
+  }
+  if (!route.getChildRoutes) {
+    return [routePath];
+  }
+  const childRoutes = await pify(route.getChildRoutes)(/* location: */ routePath);
+  return await childRoutes.reduce(
+    async (paths, childRoute) =>
+      [...(await paths), ...(await collectRoutePaths(routePath, childRoute))],
+    [routePath]
+  );
 }
 
 export function renderPath(location) {
@@ -65,7 +79,6 @@ export function renderPath(location) {
         renderPath(redirectLocation).then(resolve, reject);
       } else if (renderProps) {
         resolveComponentsQueries(routes, renderProps.components).then((resolvedQueries) => {
-          debugger
           try {
             resolve(
               `<!DOCTYPE html>${
@@ -90,4 +103,11 @@ export function renderPath(location) {
       }
     });
   });
+}
+
+export async function renderAll() {
+  const routePaths = await collectRoutePaths('/', routes);
+  return new Map(await Promise.all(routePaths.map(async (routePath) =>
+    [routePath, await renderPath(routePath)]
+  )));
 }

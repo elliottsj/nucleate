@@ -13,9 +13,10 @@ const rawLoader = require.resolve('raw-loader');
 const layoutLoader = require.resolve('./loaders/layout-loader');
 
 export default function configure({
-  outputPath,
-  name,
   entry,
+  hmr = false,
+  name,
+  outputPath,
   target,
 }) {
   const entryDir = fs.statSync(path.dirname(entry)).isDirectory()
@@ -25,7 +26,7 @@ export default function configure({
   return {
     name,
     entry: [
-      // require.resolve('webpack-hot-middleware/client'),
+      ...(hmr ? [`${require.resolve('webpack-hot-middleware/client')}?reload=true`] : []),
       require.resolve('../entry'),
     ],
     output: {
@@ -47,6 +48,7 @@ export default function configure({
         {
           test: /\.jsx?$/,
           include: entryDir,
+          exclude: /node_modules/,
           loader: babelLoader,
         },
         {
@@ -65,10 +67,6 @@ export default function configure({
       ],
     },
     resolve: {
-      // TODO: remove this
-      alias: {
-        nucleate: path.resolve(__dirname, '..'),
-      },
       root: entryDir,
       extensions: ['', '.js', '.jsx'],
     },
@@ -80,7 +78,8 @@ export default function configure({
         __SITE_ENTRY__: JSON.stringify(entry),
       }),
       new ExtractTextPlugin(`${name}.bundle.css`, { allChunks: true }),
-      // new webpack.HotModuleReplacementPlugin()
+      new webpack.optimize.OccurrenceOrderPlugin(),
+      ...(hmr ? [new webpack.HotModuleReplacementPlugin()] : []),
     ],
   };
 }

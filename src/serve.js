@@ -8,7 +8,7 @@ import Rx from 'rxjs/Rx';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 // TODO: fix https://github.com/glenjamin/webpack-hot-middleware/issues/18
-// import webpackHotMiddleware from 'webpack-hot-middleware'
+import webpackHotMiddleware from 'webpack-hot-middleware';
 
 import requireInChild from './utils/requireInChild';
 import configure from './webpack/configure';
@@ -41,18 +41,20 @@ function getBundlePath(stats) {
   );
 }
 
-export default function (source) {
+export default function serve(source) {
   const entry = path.resolve(source);
   log.info(`serving ${entry}`);
 
   const clientConfig = configure({
     entry,
+    hmr: true,
     name: 'client',
     outputPath: '/',
     target: 'web',
   });
   const serverConfig = configure({
     entry,
+    hmr: false,
     name: 'server',
     outputPath: path.resolve(__dirname, '../build'),
     target: 'node',
@@ -62,7 +64,7 @@ export default function (source) {
     publicPath: clientConfig.output.publicPath,
     stats: { chunkModules: false, colors: true },
   });
-  // const hotMiddleware = webpackHotMiddleware(compiler)
+  const hotMiddleware = webpackHotMiddleware(clientCompiler);
 
   const serverCompiler = webpack(serverConfig);
   const serverWebpack$ = createWebpack$(serverCompiler);
@@ -75,7 +77,7 @@ export default function (source) {
 
   const app = express();
   app.use(devMiddleware);
-  // app.use(hotMiddleware)
+  app.use(hotMiddleware);
   app.use((req, res) => {
     log.info('waiting for webpack');
     serverWebpackDone$.subscribe((stats) => {
