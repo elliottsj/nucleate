@@ -34,12 +34,12 @@
   "devDependencies": {
     "babel-cli": "^6.5.1",
     "babel-eslint": "^5.0.0",
-    "babel-jest": "^6.0.1",
+    "babel-jest": "^9.0.3",
     "babel-polyfill": "^6.5.0",
-    "eslint": "^1.10.1",
-    "eslint-config-airbnb": "^5.0.1",
-    "eslint-plugin-react": "^3.16.1",
-    "jest-cli": "^0.8.2"
+    "eslint": "^2.4.0",
+    "eslint-config-airbnb": "^6.1.0",
+    "eslint-plugin-react": "^4.2.3",
+    "jest-cli": "^0.9.2"
   },
   "dependencies": {
     "argv-split": "^1.0.1",
