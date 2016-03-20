@@ -31,7 +31,7 @@ function createMarkdownComponent(Layout = Children, meta, markdown) {
           renderers={{
             Link: props => /^~/.test(props.href)
               ? <Link to={props.href.replace(/^~/, '')} {...props} />
-              : 'a',
+              : <a {...props} />,
           }}
         />
       </Layout>
