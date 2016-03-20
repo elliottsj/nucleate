@@ -56,7 +56,7 @@ export default function serve(source) {
     entry,
     hmr: false,
     name: 'server',
-    outputPath: path.resolve(__dirname, '../build'),
+    outputPath: path.resolve('server_build'),
     target: 'node',
   });
   const clientCompiler = webpack(clientConfig);
