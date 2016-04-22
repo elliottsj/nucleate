@@ -29,7 +29,7 @@
   "homepage": "https://github.com/elliottsj/nucleate#readme",
   "peerDependencies": {
     "react": "^0.14.1",
-    "react-dom": "^0.14.1"
+    "react-dom": "^0.14.7"
   },
   "devDependencies": {
     "babel-cli": "^6.5.1",
