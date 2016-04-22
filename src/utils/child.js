@@ -13,7 +13,7 @@ process.on('message', (message) => {
   switch (message.type) {
     case 'REQUIRE_MODULE': {
       const modulePath = message.payload;
-      mod = require(modulePath);
+      mod = require(modulePath);  // eslint-disable-line global-require
       break;
     }
     case 'CALL_ASYNC_METHOD': {
