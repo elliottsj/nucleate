@@ -29,9 +29,14 @@ function createMarkdownComponent(Layout = Children, meta, markdown) {
         <ReactMarkdown
           source={markdown}
           renderers={{
-            Link: props => /^~/.test(props.href)
-              ? <Link to={props.href.replace(/^~/, '')} {...props} />
-              : <a {...props} />,
+            Link: props => (
+              /* eslint-disable react/prop-types */
+              /^~/.test(props.href)
+                ? <Link to={props.href.replace(/^~/, '')} {...props} />
+                : <a {...props} />
+              /* eslint-enable */
+            )
+            ,
           }}
         />
       </Layout>
@@ -87,10 +92,11 @@ function plainBasename(moduleName) {
 
 function dedupeModuleMap(moduleMap) {
   const uniqModuleMap = reduce(
-    (uniq, [moduleName, mod]) =>
+    (uniq, [moduleName, mod]) => (
       (!uniq.has(mod) || moduleName < uniq.get(mod).length)
         ? uniq.set(mod, moduleName)
-        : uniq,
+        : uniq
+    ),
     new Map(),
     moduleMap
   );
