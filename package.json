@@ -39,7 +39,7 @@
     "eslint": "^1.10.1",
     "eslint-config-airbnb": "^5.0.1",
     "eslint-plugin-react": "^3.16.1",
-    "jest-cli": "^0.8.2"
+    "jest-cli": "^0.10.2"
   },
   "dependencies": {
     "argv-split": "^1.0.1",
