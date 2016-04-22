@@ -77,7 +77,7 @@
     "hoist-non-react-statics": "^1.0.5",
     "invariant": "^2.2.0",
     "json-loader": "^0.5.4",
-    "loader-utils": "^0.2.12",
+    "loader-utils": "^0.2.14",
     "memoize-id": "^0.2.0",
     "mkdirp": "^0.5.1",
     "npmlog": "^2.0.2",
