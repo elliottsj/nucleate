@@ -72,7 +72,9 @@ export const createRoute = memoize((mod, routePath, moreChildRoutes = []) => {
 
   return {
     ...mod,
-    component: mod.component || (mod.markdown && createMarkdownComponent(mod.layout, mod.meta, mod.markdown)),
+    component: (
+      mod.component || (mod.markdown && createMarkdownComponent(mod.layout, mod.meta, mod.markdown))
+    ),
     getIndexRoute,
     getChildRoutes,
     path: mod.path || routePath,
