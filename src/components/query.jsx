@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import invariant from 'invariant';
+import hoistStatics from 'hoist-non-react-statics';
 import { resolveComponentsQueries } from '../query';
 
 function getDisplayName(WrappedComponent) {
@@ -39,6 +39,9 @@ export default function query(queries) {
       routes: PropTypes.array.isRequired,
     };
     Query.nucleateQuery = queries;
+
+    hoistStatics(Query, WrappedComponent);
+
     return Query;
   };
 }
