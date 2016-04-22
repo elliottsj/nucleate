@@ -42,7 +42,7 @@
     "jest-cli": "^0.8.2"
   },
   "dependencies": {
-    "argv-split": "^1.0.0",
+    "argv-split": "^1.0.1",
     "babel-loader": "^6.2.1",
     "babel-plugin-check-es2015-constants": "^6.5.0",
     "babel-plugin-transform-async-to-generator": "^6.5.0",
