@@ -35,7 +35,7 @@
     "babel-cli": "^6.5.1",
     "babel-eslint": "^5.0.0",
     "babel-jest": "^6.0.1",
-    "babel-polyfill": "^6.5.0",
+    "babel-polyfill": "^6.7.2",
     "eslint": "^1.10.1",
     "eslint-config-airbnb": "^5.0.1",
     "eslint-plugin-react": "^3.16.1",
