@@ -109,7 +109,7 @@ function createRoutesFromMap(moduleMap) {
 
 export function includeRoute(loadModule) {
   return async (location, callback) => {
-    callback(null, await loadModule());
+    callback(null, createRoute(await loadModule()));
   };
 }
 
