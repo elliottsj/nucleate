@@ -34,7 +34,7 @@
   "devDependencies": {
     "babel-cli": "^6.5.1",
     "babel-eslint": "^5.0.0",
-    "babel-jest": "^6.0.1",
+    "babel-jest": "^10.0.1",
     "babel-polyfill": "^6.5.0",
     "eslint": "^1.10.1",
     "eslint-config-airbnb": "^5.0.1",
