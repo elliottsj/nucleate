@@ -26,7 +26,7 @@ export default function (source, destination) {
 
   const clientConfig = configure({
     entry,
-    hmr: true,
+    hmr: false,
     name: 'client',
     outputPath: path.resolve(destination, 'assets'),
     target: 'web',
