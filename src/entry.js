@@ -5,7 +5,7 @@ import React, { Component, PropTypes } from 'react';
 import { render } from 'react-dom';
 import { renderToString } from 'react-dom/server';
 import { browserHistory, match, Router, RouterContext } from 'react-router';
-import urljoin from 'url-join';
+import url from 'url';
 
 import { createRoute } from '.';
 import { resolveComponentsQueries } from './query';
@@ -93,8 +93,9 @@ if (typeof document !== 'undefined') {
 }
 
 async function collectRoutePaths(prefix, route): Promise<Array<string>> {
-  const routePath = urljoin(prefix, route.path);
+  const routePath = url.resolve(prefix, route.path);
   if (/\*|:|\(|\)/.test(routePath)) {
+    // Cannot handle react-router's dynamic route matching; only static routes
     return [];
   }
   if (!route.getChildRoutes) {
@@ -151,7 +152,7 @@ export function renderPath(location) {
 }
 
 export async function renderAll() {
-  const routePaths = await collectRoutePaths('/', routes);
+  const routePaths = await collectRoutePaths(/* start at root path */ '', routes);
   return new Map(await Promise.all(routePaths.map(async (routePath) =>
     [routePath, await renderPath(routePath)]
   )));
