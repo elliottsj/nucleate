@@ -7,6 +7,7 @@
   "scripts": {
     "build": "babel src --out-dir lib",
     "develop": "babel src --watch --out-dir lib",
+    "flow": "flow",
     "jest": "jest",
     "jest-watch": "jest --watch",
     "lint": "eslint src",
@@ -37,6 +38,7 @@
     "eslint-plugin-import": "^1.5.0",
     "eslint-plugin-jsx-a11y": "^1.0.2",
     "eslint-plugin-react": "^5.0.1",
+    "flow-bin": "^0.24.2",
     "jest-cli": "^11.0.2"
   },
   "dependencies": {

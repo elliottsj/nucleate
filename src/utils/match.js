@@ -1,3 +1,5 @@
+/* @flow */
+
 import { match } from 'react-router';
 import pify from 'pify';
 
