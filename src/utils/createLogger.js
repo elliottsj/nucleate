@@ -2,7 +2,7 @@
 
 import log from 'npmlog';
 
-type Logger = {
+export interface Logger {
   error(message: string): void;
   info(message: string): void;
   log(message: string): void;
@@ -10,7 +10,7 @@ type Logger = {
   silly(message: string): void;
   verbose(message: string): void;
   warn(message: string): void;
-};
+}
 
 /**
  * Create a stderr logger with the given prefix.

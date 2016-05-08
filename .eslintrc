@@ -1,10 +1,17 @@
 {
   "parser": "babel-eslint",
   "extends": "airbnb",
+  "plugins": [
+    "flow-vars"
+  ],
   "env": {
     "jest": true
   },
   "globals": {
     __SITE_ENTRY__: true
+  },
+  "rules": {
+    "flow-vars/define-flow-type": 1,
+    "flow-vars/use-flow-type": 1
   }
 }
