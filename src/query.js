@@ -3,7 +3,7 @@ import pify from 'pify';
 
 import awaitValues from './utils/awaitValues';
 import match from './utils/match';
-import mapValues from './utils/mapValues';
+import mapValues from 'lodash/fp/mapValues';
 
 async function getIndexRoute(route) {
   if (route.indexRoute) {
