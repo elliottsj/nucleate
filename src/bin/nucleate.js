@@ -13,10 +13,20 @@ program
   .command(
     'serve <source>'
   )
+  .option(
+    '-p --port [port]',
+    'Port to use. [3000]',
+    v => parseInt(v, 10),
+    3000,
+  )
+  .option(
+    '-h --hostname [hostname]',
+    'Hostname to use. [::] if IPv6 available, else [0.0.0.0]',
+  )
   .description(
     'Serve the site from the given source directory'
   )
-  .action(source => serve(source));
+  .action((source, options) => serve(source, options.port, options.hostname));
 
 program
   .command(

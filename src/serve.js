@@ -7,6 +7,7 @@ import { Observable } from '@reactivex/rxjs';
 import split from 'argv-split';
 import express from 'express';
 import path from 'path';
+import url from 'url';
 import webpack from 'webpack';
 import Stats from 'webpack/lib/Stats';
 import webpackDevMiddleware from 'webpack-dev-middleware';
@@ -54,8 +55,12 @@ function getBundlePath(stats: Stats): string {
  * Serve the Nucleate site from the given directory.
  * @param  {string} source
  *   Path to the directory containing the site root
+ * @param  {number} port
+ *   Port on which to serve the site
+ * @param  {string} hostname
+ *   Hostname on which to serve the site
  */
-export default function serve(source: string) {
+export default function serve(source: string, port: number, hostname: string) {
   const entry = path.resolve(source);
   log.info(`serving ${entry}`);
 
@@ -123,7 +128,12 @@ export default function serve(source: string) {
     });
   });
 
-  app.listen(3000, () => {
-    log.info(`started listening on port ${3000}`);
+  const server = app.listen(port, hostname, () => {
+    const address = server.address();
+    log.info(`serving on ${url.format({
+      protocol: 'http',
+      hostname: address.address,
+      port: address.port,
+    })}`);
   });
 }
