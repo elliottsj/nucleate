@@ -4,6 +4,7 @@
   "description": "An example blog built with Nucleate",
   "main": "index.jsx",
   "scripts": {
+    "build": "nucleate build .",
     "start": "nucleate serve .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
