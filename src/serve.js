@@ -9,7 +9,6 @@ import path from 'path';
 import Rx from 'rxjs/Rx';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
-// TODO: fix https://github.com/glenjamin/webpack-hot-middleware/issues/18
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
 import createChildExecutor from './utils/createChildExecutor';
@@ -28,7 +27,7 @@ const BUNDLE_ARGV = split(process.env.BUNDLE_ARGV || '');
 function createWebpack$(compiler) {
   const webpack$ = Rx.Observable.create((observer) => {
     compiler.plugin('invalid', () => observer.next(null));
-    compiler.plugin('failed', err => observer.error(err));
+    compiler.plugin('failed', error => observer.error(error));
     compiler.plugin('done', stats => observer.next(stats));
   }).publishReplay(1);
   webpack$.connect();
@@ -90,7 +89,7 @@ export default function serve(source) {
         log.info(`rendered ${req.path}`);
         res.send(markup);
       } catch (error) {
-        log.error(error.stack);
+        log.error(`server render error:\n${error.stack}`);
         res.status(500).type('text').send(error.stack);
       }
     }, () => {
