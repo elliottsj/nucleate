@@ -16,7 +16,6 @@ export default function query(queries) {
           routes[0],
           routes.map(r => r.component)
         ).then((resolvedQueries) => {
-          console.info('resolved queries', resolvedQueries);
           mergeResolvedQueries(resolvedQueries);
         });
       }
