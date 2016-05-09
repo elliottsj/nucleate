@@ -1,3 +1,5 @@
+/* @flow */
+
 import createLogger from './utils/createLogger';
 const log = createLogger('serve');
 
@@ -10,7 +12,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 // TODO: fix https://github.com/glenjamin/webpack-hot-middleware/issues/18
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
-import requireInChild from './utils/requireInChild';
+import createChildExecutor from './utils/createChildExecutor';
 import configure from './webpack/configure';
 
 const BUNDLE_ARGV = split(process.env.BUNDLE_ARGV || '');
@@ -80,18 +82,17 @@ export default function serve(source) {
   app.use(hotMiddleware);
   app.use((req, res) => {
     log.info('waiting for webpack');
-    serverWebpackDone$.subscribe((stats) => {
+    serverWebpackDone$.subscribe(async (stats) => {
       const bundlePath = getBundlePath(stats);
-      const bundleProxy = requireInChild(bundlePath, BUNDLE_ARGV);
-      bundleProxy.callAsyncMethod('renderPath', req.path).then((markup) => {
+      const bundleExecutor = createChildExecutor(bundlePath, BUNDLE_ARGV);
+      try {
+        const markup = await bundleExecutor.invoke('renderPath', req.path);
         log.info(`rendered ${req.path}`);
-        bundleProxy.kill();
         res.send(markup);
-      }).catch((error) => {
-        bundleProxy.kill();
+      } catch (error) {
         log.error(error.stack);
         res.status(500).type('text').send(error.stack);
-      });
+      }
     }, () => {
       log.error('error rendering page using server bundle');
     }, () => {

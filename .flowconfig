@@ -10,6 +10,7 @@ decls
 
 [options]
 suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
+suppress_comment= \\(.\\|\n\\)*\\$FlowIgnore
 suppress_comment= \\(.\\|\n\\)*\\$FlowIssue
 
 [version]

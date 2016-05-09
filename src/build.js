@@ -8,7 +8,7 @@ import path from 'path';
 import webpack from 'webpack';
 
 import configure from './webpack/configure';
-import requireInChild from './utils/requireInChild';
+import createChildExecutor from './utils/createChildExecutor';
 
 const BUNDLE_ARGV = split(process.env.BUNDLE_ARGV || '');
 
@@ -48,24 +48,23 @@ export default function (source, destination) {
   });
 
   const serverCompiler = webpack(serverConfig);
-  serverCompiler.run((err, stats) => {
+  serverCompiler.run(async (err, stats) => {
     if (err) {
       throw err;
     }
     const bundlePath = getBundlePath(stats);
-    const bundleProxy = requireInChild(bundlePath, BUNDLE_ARGV);
-    bundleProxy.callAsyncMethod('renderAll').then((routesMarkup) => {
-      bundleProxy.kill();
+    const bundleExecutor = createChildExecutor(bundlePath, BUNDLE_ARGV);
+    try {
+      const routesMarkup = await bundleExecutor.invoke('renderAll');
       for (const [routePath, markup] of routesMarkup) {
         const htmlPath = path.resolve(destination, routePath.replace(/^\//, ''), 'index.html');
         log.info(`rendering ${htmlPath}`);
         mkdirp.sync(path.dirname(htmlPath));
         fs.writeFileSync(htmlPath, markup);
       }
-    }).catch((error) => {
-      bundleProxy.kill();
+    } catch (error) {
       log.error(error.stack);
-    });
+    }
     log.info('server webpack completed');
     log.log('info', stats.toString({ chunkModules: false, colors: true }));
   });
