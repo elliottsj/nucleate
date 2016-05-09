@@ -3,10 +3,10 @@
 import createLogger from './utils/createLogger';
 const log = createLogger('serve');
 
+import { Observable } from '@reactivex/rxjs';
 import split from 'argv-split';
 import express from 'express';
 import path from 'path';
-import Rx from 'rxjs/Rx';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
@@ -25,7 +25,7 @@ const BUNDLE_ARGV = split(process.env.BUNDLE_ARGV || '');
  * @return {Observable}        A hot RxJS Observable
  */
 function createWebpack$(compiler) {
-  const webpack$ = Rx.Observable.create((observer) => {
+  const webpack$ = Observable.create((observer) => {
     compiler.plugin('invalid', () => observer.next(null));
     compiler.plugin('failed', error => observer.error(error));
     compiler.plugin('done', stats => observer.next(stats));

@@ -43,6 +43,7 @@
     "jest-cli": "^11.0.2"
   },
   "dependencies": {
+    "@reactivex/rxjs": "^5.0.0-beta.7",
     "argv-split": "^1.0.1",
     "babel-loader": "^6.2.4",
     "babel-plugin-check-es2015-constants": "^6.7.2",
@@ -88,7 +89,6 @@
     "react-dom": "^15.0.1",
     "react-markdown": "^2.2.0",
     "react-router": "^2.3.0",
-    "rxjs": "^5.0.0-beta.2",
     "serialize-error": "^2.0.0",
     "webpack": "^1.13.0",
     "webpack-dev-middleware": "^1.6.1",
