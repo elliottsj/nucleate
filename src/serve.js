@@ -8,12 +8,15 @@ import split from 'argv-split';
 import express from 'express';
 import path from 'path';
 import webpack from 'webpack';
+import Stats from 'webpack/lib/Stats';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
 import createChildExecutor from './utils/createChildExecutor';
 import configure from './webpack/configure';
 
+// If a BUNDLE_ARGV env var is defined, pass it as arguments
+// to the child process executing the bundle
 const BUNDLE_ARGV = split(process.env.BUNDLE_ARGV || '');
 
 /**
@@ -21,10 +24,12 @@ const BUNDLE_ARGV = split(process.env.BUNDLE_ARGV || '');
  * progress, and emits the webpack `stats` object when the build is completed.
  * The most recent element is replayed to new subscribers.
  *
- * @param  {Compiler} compiler The webpack compiler
- * @return {Observable}        A hot RxJS Observable
+ * @param  {Compiler} compiler
+ *   The webpack compiler
+ * @return {Observable}
+ *   A hot RxJS Observable
  */
-function createWebpack$(compiler) {
+function createWebpack$(compiler: webpack.Compiler): Observable {
   const webpack$ = Observable.create((observer) => {
     compiler.plugin('invalid', () => observer.next(null));
     compiler.plugin('failed', error => observer.error(error));
@@ -34,7 +39,10 @@ function createWebpack$(compiler) {
   return webpack$;
 }
 
-function getBundlePath(stats) {
+/**
+ * Get the absolute path to the main JS bundle on disk.
+ */
+function getBundlePath(stats: Stats): string {
   const mainAssets = stats.toJson().assetsByChunkName.main;
   return path.resolve(
     stats.compilation.compiler.outputPath,
@@ -42,23 +50,26 @@ function getBundlePath(stats) {
   );
 }
 
-export default function serve(source) {
+/**
+ * Serve the Nucleate site from the given directory.
+ * @param  {string} source
+ *   Path to the directory containing the site root
+ */
+export default function serve(source: string) {
   const entry = path.resolve(source);
   log.info(`serving ${entry}`);
 
+  /*
+   * Configure and start webpack bundler for the browser, served over HTTP via
+   * webpack-dev-middleware, with hot reload via webpack-hot-middleware.
+   */
   const clientConfig = configure({
     entry,
     hmr: true,
     name: 'client',
+    // Output to the root of webpack-dev-middleware's memory file system
     outputPath: '/',
     target: 'web',
-  });
-  const serverConfig = configure({
-    entry,
-    hmr: false,
-    name: 'server',
-    outputPath: path.resolve(__dirname, '../build'),
-    target: 'node',
   });
   const clientCompiler = webpack(clientConfig);
   const devMiddleware = webpackDevMiddleware(clientCompiler, {
@@ -67,6 +78,20 @@ export default function serve(source) {
   });
   const hotMiddleware = webpackHotMiddleware(clientCompiler);
 
+  /*
+   * Configure and start webpack bundler for the server for static rendering.
+   * Resulting bundle is executed in a child process for each incoming request.
+   */
+  const serverConfig = configure({
+    entry,
+    hmr: false,
+    name: 'server',
+    // Output to 'node_modules/nucleate/build'
+    // XXX: only one site can be served at a time per node_modules directory
+    // TODO: output to unique location (memory?) to allow multiple sites
+    outputPath: path.resolve(__dirname, '../build'),
+    target: 'node',
+  });
   const serverCompiler = webpack(serverConfig);
   const serverWebpack$ = createWebpack$(serverCompiler);
   // Create an observable which completes upon successful webpack build
@@ -82,8 +107,7 @@ export default function serve(source) {
   app.use((req, res) => {
     log.info('waiting for webpack');
     serverWebpackDone$.subscribe(async (stats) => {
-      const bundlePath = getBundlePath(stats);
-      const bundleExecutor = createChildExecutor(bundlePath, BUNDLE_ARGV);
+      const bundleExecutor = createChildExecutor(getBundlePath(stats), BUNDLE_ARGV);
       try {
         const markup = await bundleExecutor.invoke('renderPath', req.path);
         log.info(`rendered ${req.path}`);
@@ -92,8 +116,8 @@ export default function serve(source) {
         log.error(`server render error:\n${error.stack}`);
         res.status(500).type('text').send(error.stack);
       }
-    }, () => {
-      log.error('error rendering page using server bundle');
+    }, (error) => {
+      log.error(`error rendering page using server bundle:\n${error.stack}`);
     }, () => {
       log.info('completed page render');
     });
