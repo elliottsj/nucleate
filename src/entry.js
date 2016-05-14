@@ -7,7 +7,7 @@ import { renderToString } from 'react-dom/server';
 import { browserHistory, match, Router, RouterContext } from 'react-router';
 import url from 'url';
 
-import { createRoute } from '.';
+import { assets, createRoute } from '.';
 import { resolveComponentsQueries } from './query';
 import QueryContext from './components/QueryContext';
 
@@ -41,14 +41,20 @@ class ServerError extends Component {
     const { location } = this.props;
 
     return (
-      <div>
-        <h3>Nucleate server error</h3>
-        {location.query.destination ? (
-          <p>Redirected to <em>{location.query.destination}</em>; check the console for errors</p>
-        ) : (
-          <p>No destination specified</p>
-        )}
-      </div>
+      <html>
+        <head>
+          <title>Nucleate</title>
+          {assets()}
+        </head>
+        <body>
+          <h3>Nucleate server error</h3>
+          {location.query.destination ? (
+            <p>Redirected to <em>{location.query.destination}</em>; check the console for errors</p>
+          ) : (
+            <p>No destination specified</p>
+          )}
+        </body>
+      </html>
     );
   }
 }
@@ -62,7 +68,11 @@ const noMatchRoute = {
   path: '*',
   component: NoMatch,
 };
-const routes = createRoute(siteEntry, '/', [serverErrorRoute, noMatchRoute]);
+const routes = [
+  createRoute(siteEntry, '/'),
+  serverErrorRoute,
+  noMatchRoute,
+];
 
 function renderToDocument(location) {
   // calling `match` is simply for side effects of
