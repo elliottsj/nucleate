@@ -122,26 +122,28 @@ export function renderPath(location) {
       } else if (renderProps) {
         resolveComponentsQueries(routes, renderProps.components).then((resolvedQueries) => {
           try {
+            const markup = renderToString(
+              <QueryContext resolvedQueries={resolvedQueries}>
+                <RouterContext {...renderProps} />
+              </QueryContext>
+            );
             resolve(
-              `<!DOCTYPE html>${
-                renderToString(
-                  <QueryContext resolvedQueries={resolvedQueries}>
-                    <RouterContext {...renderProps} />
-                  </QueryContext>
-                )
-              }`
+              `<!DOCTYPE html>${markup}`
             );
           } catch (e) {
-            // TODO: render a basic page for browser debugging?
-            // 1. Render a bare html page at '/server_error?destination=<path>'
-            //    with links to assets and an empty <body>
-            // 2. After initial render, immediately navigate to `destination`
-            // 3. User can then debug their error
-
-            renderPath(`/server_error?destination=${location.pathname || location}`)
-              .then(resolve, reject);
-
-            // reject(e);
+            const destination = location.pathname || location;
+            if (destination.startsWith('/server_error')) {
+              console.warn('Detected infinite loop rendering /server_error');
+              reject(e);
+            } else {
+              // Render a basic page for browser debugging:
+              // 1. Render a bare html page at '/server_error?destination=<path>'
+              //    with links to assets and an empty <body>
+              // 2. After initial render, immediately navigate to `destination`
+              // 3. User can then debug their error
+              renderPath(`/server_error?destination=${destination}`)
+                .then(resolve, reject);
+            }
           }
         });
       } else {
