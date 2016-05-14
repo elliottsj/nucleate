@@ -9,6 +9,7 @@ const cssLoader = require.resolve('css-loader');
 const frontMatterLoader = require.resolve('front-matter-loader');
 const jsonLoader = require.resolve('json-loader');
 const rawLoader = require.resolve('raw-loader');
+const urlLoader = require.resolve('url-loader');
 
 const layoutLoader = require.resolve('./loaders/layout-loader');
 
@@ -67,6 +68,10 @@ export default function configure({
             meta: [jsonLoader, `${frontMatterLoader}?onlyAttributes`],
             markdown: [rawLoader, `${frontMatterLoader}?onlyBody`],
           })}`,
+        },
+        {
+          test: /\.(gif|jpg|jpeg|png|svg|eot|woff|woff2|ttf)$/,
+          loader: `${urlLoader}?limit=10000`,
         },
       ],
     },
