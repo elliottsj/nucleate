@@ -1,4 +1,6 @@
 #! /usr/bin/env node
+/* @flow */
+
 import pkg from '../../package.json';
 import program from 'commander';
 
@@ -21,12 +23,15 @@ program
   )
   .option(
     '-h --hostname [hostname]',
-    'Hostname to use. [::] if IPv6 available, else [0.0.0.0]',
+    'Hostname to use. [::] if IPv6 available, else 0.0.0.0',
   )
   .description(
     'Serve the site from the given source directory'
   )
-  .action((source, options) => serve(source, options.port, options.hostname));
+  .action(
+    (source, options) =>
+      serve(source, options.port, options.hostname)
+  );
 
 program
   .command(
@@ -35,6 +40,9 @@ program
   .description(
     'Build site from the given source directory, optionally specifying a destination directory'
   )
-  .action((source, destination = './build') => build(source, destination));
+  .action(
+    (source, destination = './build') =>
+      build(source, destination)
+  );
 
 program.parse(process.argv);
