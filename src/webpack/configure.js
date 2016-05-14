@@ -42,8 +42,12 @@ export default function configure({
       loaders: [
         {
           test: /\.css$/,
-          include: entryDir,
+          exclude: /\.module\.css$/,
           loader: ExtractTextPlugin.extract(cssLoader),
+        },
+        {
+          test: /\.module\.css$/,
+          loader: ExtractTextPlugin.extract(`${cssLoader}?modules`),
         },
         {
           test: /\.jsx?$/,
