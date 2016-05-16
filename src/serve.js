@@ -69,6 +69,7 @@ export default function serve(source: string, port: number, hostname: string) {
    * webpack-dev-middleware, with hot reload via webpack-hot-middleware.
    */
   const clientConfig = configure({
+    commonsChunk: true,
     entry,
     hmr: true,
     name: 'client',
