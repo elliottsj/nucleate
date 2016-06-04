@@ -2,6 +2,7 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import fs from 'fs';
 import path from 'path';
 import webpack from 'webpack';
+import ChunkApiPlugin from 'webpack-chunks-api-plugin';
 
 const babelLoader = require.resolve('babel-loader');
 const combineLoader = require.resolve('combine-loader');
@@ -14,6 +15,7 @@ const urlLoader = require.resolve('url-loader');
 const layoutLoader = require.resolve('./loaders/layout-loader');
 
 export default function configure({
+  commonsChunk = false,
   entry,
   hmr = false,
   name,
@@ -33,7 +35,8 @@ export default function configure({
     output: {
       path: outputPath,
       publicPath: '/assets/',
-      filename: `${name}.bundle.js`,
+      chunkFilename: '[name].bundle.js',
+      filename: '[name].bundle.js',
       pathinfo: true,
       libraryTarget: 'umd',
     },
@@ -70,7 +73,7 @@ export default function configure({
           })}`,
         },
         {
-          test: /\.(gif|jpg|jpeg|png|svg|eot|woff|woff2|ttf)$/,
+          test: /\.(gif|jpg|jpeg|png|svg|eot|woff|woff2|ttf)(\?v=.+)?$/,
           loader: `${urlLoader}?limit=10000`,
         },
       ],
@@ -86,9 +89,14 @@ export default function configure({
       new webpack.DefinePlugin({
         __SITE_ENTRY__: JSON.stringify(entry),
       }),
-      new ExtractTextPlugin(`${name}.bundle.css`, { allChunks: true }),
-      new webpack.optimize.OccurrenceOrderPlugin(),
-      ...(hmr ? [new webpack.HotModuleReplacementPlugin()] : []),
+      new ExtractTextPlugin('[name].bundle.css', { allChunks: true }),
+      ...(commonsChunk ? [
+        new webpack.optimize.CommonsChunkPlugin({ name: 'commons' }),
+      ] : []),
+      ...(hmr ? [
+        new webpack.HotModuleReplacementPlugin(),
+      ] : []),
+      new ChunkApiPlugin(),
     ],
   };
 }
