@@ -35,7 +35,8 @@ export default function configure({
     output: {
       path: outputPath,
       publicPath: '/assets/',
-      filename: `${name}.[name].bundle.js`,
+      chunkFilename: '[name].bundle.js',
+      filename: '[name].bundle.js',
       pathinfo: true,
       libraryTarget: 'umd',
     },
@@ -88,8 +89,7 @@ export default function configure({
       new webpack.DefinePlugin({
         __SITE_ENTRY__: JSON.stringify(entry),
       }),
-      new ExtractTextPlugin(`${name}.[name].bundle.css`, { allChunks: true }),
-      new webpack.optimize.OccurrenceOrderPlugin(),
+      new ExtractTextPlugin('[name].bundle.css', { allChunks: true }),
       ...(commonsChunk ? [
         new webpack.optimize.CommonsChunkPlugin({ name: 'commons' }),
       ] : []),
