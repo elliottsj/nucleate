@@ -8,8 +8,9 @@ const babelLoader = require.resolve('babel-loader');
 const combineLoader = require.resolve('combine-loader');
 const cssLoader = require.resolve('css-loader');
 const frontMatterLoader = require.resolve('front-matter-loader');
+const htmlLoader = require.resolve('html-loader');
 const jsonLoader = require.resolve('json-loader');
-const rawLoader = require.resolve('raw-loader');
+const markdownItLoader = require.resolve('markdown-it-loader');
 const urlLoader = require.resolve('url-loader');
 
 const layoutLoader = require.resolve('./loaders/layout-loader');
@@ -69,7 +70,7 @@ export default function configure({
           loader: `${combineLoader}?${JSON.stringify({
             layout: [layoutLoader, jsonLoader, `${frontMatterLoader}?onlyAttributes`],
             meta: [jsonLoader, `${frontMatterLoader}?onlyAttributes`],
-            markdown: [rawLoader, `${frontMatterLoader}?onlyBody`],
+            html: [htmlLoader, markdownItLoader, `${frontMatterLoader}?onlyBody`],
           })}`,
         },
         {
@@ -80,7 +81,7 @@ export default function configure({
     },
     resolve: {
       root: entryDir,
-      extensions: ['', '.js', '.jsx'],
+      extensions: ['', '.js', '.jsx', '.json'],
     },
     resolveLoader: {
       fallback: path.resolve(__dirname, './loaders'),
@@ -98,5 +99,8 @@ export default function configure({
       ] : []),
       new ChunkApiPlugin(),
     ],
+    'markdown-it': {
+      preset: 'commonmark',
+    },
   };
 }

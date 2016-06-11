@@ -1,7 +1,7 @@
 import memoize from 'memoize-id';
 import path from 'path';
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
+import renderHTML from '@elliottsj/react-render-html';
 import { Link } from 'react-router';
 import {
   filter,
@@ -22,23 +22,23 @@ export {
   resolveQueries,
 } from './query';
 
-function createMarkdownComponent(Layout = Children, meta, markdown) {
-  return function MarkdownPage() {
+function replaceLinks() {
+  return (next) => (node, key) => {
+    const element = next(node, key);
+    if (node.tagName === 'a' && /^~/.test(element.props.href)) {
+      return <Link {...element.props} to={element.props.href.replace(/^~/, '')} />;
+    }
+    return element;
+  };
+}
+
+function createHTMLComponent(Layout = Children, meta, html) {
+  return function HTMLFragment() {
     return (
       <Layout {...meta}>
-        <ReactMarkdown
-          source={markdown}
-          renderers={{
-            Link: props => (
-              /* eslint-disable react/prop-types */
-              /^~/.test(props.href)
-                ? <Link to={props.href.replace(/^~/, '')} {...props} />
-                : <a {...props} />
-              /* eslint-enable */
-            )
-            ,
-          }}
-        />
+        <div>
+          {renderHTML(html, replaceLinks)}
+        </div>
       </Layout>
     );
   };
@@ -78,7 +78,7 @@ export const createRoute = memoize((mod, routePath, moreChildRoutes = []) => {
   return {
     ...mod,
     component: (
-      mod.component || (mod.markdown && createMarkdownComponent(mod.layout, mod.meta, mod.markdown))
+      mod.component || (mod.html && createHTMLComponent(mod.layout, mod.meta, mod.html))
     ),
     getIndexRoute,
     getChildRoutes,
