@@ -40,7 +40,9 @@
     "eslint-plugin-jsx-a11y": "^1.0.2",
     "eslint-plugin-react": "^5.0.1",
     "flow-bin": "^0.24.2",
-    "jest-cli": "^11.0.2"
+    "jest-cli": "^11.0.2",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0"
   },
   "dependencies": {
     "@reactivex/rxjs": "^5.0.0-beta.7",
@@ -86,8 +88,6 @@
     "pify": "^2.3.0",
     "promise-loader": "^1.0.0",
     "raw-loader": "^0.5.1",
-    "react": "^15.0.1",
-    "react-dom": "^15.0.1",
     "react-markdown": "^2.2.0",
     "react-router": "^2.3.0",
     "serialize-error": "^2.0.0",
@@ -97,6 +97,10 @@
     "webpack-dev-middleware": "^1.6.1",
     "webpack-hot-middleware": "^2.10.0",
     "wu": "^2.1.0"
+  },
+  "peerDependencies": {
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
