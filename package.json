@@ -87,7 +87,7 @@
     "markdown-it-loader": "^0.2.0",
     "memoize-id": "^0.2.0",
     "mkdirp": "^0.5.1",
-    "npmlog": "^2.0.3",
+    "npmlog": "^3.1.1",
     "pify": "^2.3.0",
     "promise-loader": "^1.0.0",
     "raw-loader": "^0.5.1",
