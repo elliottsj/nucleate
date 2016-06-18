@@ -88,6 +88,7 @@ export default function configure({
     },
     plugins: [
       new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
         __SITE_ENTRY__: JSON.stringify(entry),
       }),
       new ExtractTextPlugin('[name].bundle.css', { allChunks: true }),
