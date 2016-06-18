@@ -48,11 +48,11 @@ export default function configure({
         {
           test: /\.css$/,
           exclude: /\.module\.css$/,
-          loader: ExtractTextPlugin.extract(cssLoader),
+          loader: ExtractTextPlugin.extract(`${cssLoader}?sourceMap`),
         },
         {
           test: /\.module\.css$/,
-          loader: ExtractTextPlugin.extract(`${cssLoader}?modules`),
+          loader: ExtractTextPlugin.extract(`${cssLoader}?sourceMap&modules`),
         },
         {
           test: /\.jsx?$/,
