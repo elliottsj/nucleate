@@ -76,7 +76,7 @@
     "css-loader": "^0.23.1",
     "express": "^4.13.4",
     "extract-text-webpack-plugin": "^1.0.1",
-    "file-loader": "^0.8.5",
+    "file-loader": "^0.9.0",
     "front-matter-loader": "^0.1.2",
     "hoist-non-react-statics": "^1.0.5",
     "html-loader": "^0.4.3",
