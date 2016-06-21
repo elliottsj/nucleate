@@ -42,7 +42,7 @@ export default function configure({
       libraryTarget: 'umd',
     },
     target,
-    devtool: 'eval',
+    devtool: 'source-map',
     module: {
       loaders: [
         {
