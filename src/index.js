@@ -9,6 +9,9 @@ import {
 } from 'wu';
 import Children from './components/Children';
 import invertMap from './utils/invertMap';
+import {
+  asCPSFunction1,
+} from './utils/promises';
 import resolvePromiseMap from './utils/resolvePromiseMap';
 
 export { Link };
@@ -21,6 +24,12 @@ export {
   queryChildRoutes,
   resolveQueries,
 } from './query';
+
+type RouteModule = ReactRouter$PlainRoute & {
+  html?: string,
+  layout?: ReactClass,
+  meta?: JSONObject,
+};
 
 function replaceLinks() {
   return (next) => (node, key) => {
@@ -115,10 +124,8 @@ function createRoutesFromMap(moduleMap) {
   );
 }
 
-export function includeRoute(loadModule) {
-  return async (location, callback) => {
-    callback(null, createRoute(await loadModule()));
-  };
+export function includeRoute(loadModule: () => Promise<RouteModule>): ReactRouter$AsyncIndexRoute {
+  return asCPSFunction1(loadModule().then(createRoute));
 }
 
 export function includeRoutes(context) {
