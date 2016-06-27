@@ -1,18 +1,20 @@
+/* @flow */
+
+import map from 'lodash/fp/map';
+import pipe from 'lodash/fp/pipe';
+import sortBy from 'lodash/fp/sortBy';
+import uniqBy from 'lodash/fp/uniqBy';
 import memoize from 'memoize-id';
 import path from 'path';
 import React from 'react';
 import renderHTML from '@elliottsj/react-render-html';
 import { Link } from 'react-router';
-import {
-  filter,
-  reduce,
-} from 'wu';
+
+import type { PlainRoute } from 'react-router';
+import type { Context } from 'webpack';
+
 import Children from './components/Children';
-import invertMap from './utils/invertMap';
-import {
-  asCPSFunction1,
-} from './utils/promises';
-import resolvePromiseMap from './utils/resolvePromiseMap';
+import { asCPSFunction1 } from './utils/promises';
 
 export { Link };
 export { default as assets } from './components/assets';
@@ -30,6 +32,8 @@ type RouteModule = ReactRouter$PlainRoute & {
   layout?: ReactClass,
   meta?: JSONObject,
 };
+type ModulePath = string;
+type ContextRouteModule = [ModulePath, RouteModule];
 
 function replaceLinks() {
   return (next) => (node, key) => {
@@ -85,6 +89,7 @@ export const createRoute = memoize((mod, routePath, moreChildRoutes = []) => {
   );
 
   return {
+    meta: {},
     ...mod,
     component: (
       mod.component || (mod.html && createHTMLComponent(mod.layout, mod.meta, mod.html))
@@ -95,46 +100,23 @@ export const createRoute = memoize((mod, routePath, moreChildRoutes = []) => {
   };
 });
 
-function plainBasename(moduleName) {
+function basenameWithoutExtension(moduleName) {
   return path.basename(moduleName, path.extname(moduleName));
 }
 
-function dedupeModuleMap(moduleMap) {
-  const uniqModuleMap = reduce(
-    (uniq, [moduleName, mod]) => (
-      (!uniq.has(mod) || moduleName < uniq.get(mod).length)
-        ? uniq.set(mod, moduleName)
-        : uniq
-    ),
-    new Map(),
-    moduleMap
-  );
-
-  return invertMap(uniqModuleMap);
-}
-
-function createRoutesFromMap(moduleMap) {
-  const nonIndexModuleMap = filter(
-    ([moduleName]) => plainBasename(moduleName) !== 'index',
-    moduleMap
-  );
-  const uniqModuleMap = dedupeModuleMap(nonIndexModuleMap);
-  return [...uniqModuleMap].map(
-    ([moduleName, mod]) => createRoute(mod, plainBasename(moduleName))
-  );
-}
+const createRoutesFromModules: (modules: ContextRouteModule[]) => PlainRoute[] = pipe(
+  // Sort by shortest module path so that the shorter path is taken for duplicate modules
+  // e.g. choose './posts' over './posts.jsx'
+  sortBy(([modulePath]) => modulePath.length),
+  uniqBy(([, mod]) => mod),
+  map(([modulePath, mod]) => createRoute(mod, basenameWithoutExtension(modulePath))),
+);
 
 export function includeRoute(loadModule: () => Promise<RouteModule>): ReactRouter$AsyncIndexRoute {
   return asCPSFunction1(loadModule().then(createRoute));
 }
-
-export function includeRoutes(context) {
-  const loadModules = () => resolvePromiseMap(new Map(
-    context.keys().map(moduleName => [moduleName, context(moduleName)()])
-  ));
-
-  return async (location, callback) => {
-    const moduleMap = await loadModules();
-    callback(null, createRoutesFromMap(moduleMap));
-  };
+export function includeRoutes(context: Context): ReactRouter$AsyncChildRoutes {
+  const modulesPromises: Promise<ContextRouteModule>[] = context.keys()
+    .map(modulePath => context(modulePath)().then(mod => [modulePath, mod]));
+  return asCPSFunction1(Promise.all(modulesPromises).then(createRoutesFromModules));
 }
