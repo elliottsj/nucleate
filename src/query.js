@@ -3,7 +3,9 @@
 import path from 'path';
 import pify from 'pify';
 
-import awaitValues from './utils/awaitValues';
+import {
+  allValues as promiseAllValues,
+} from './utils/promises';
 import match from './utils/match';
 import mapValues from 'lodash/fp/mapValues';
 
@@ -65,7 +67,7 @@ async function resolveQueries(routes, component) {
   if (!component.nucleateQuery) {
     return null;
   }
-  return awaitValues(mapValues(query => query(routes), component.nucleateQuery));
+  return promiseAllValues(mapValues(query => query(routes), component.nucleateQuery));
 }
 
 export async function resolveComponentsQueries(routes, components) {
