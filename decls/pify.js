@@ -1,8 +1,3 @@
-type CPSCallback<T> = (error: ?Error, value: T) => void;
-/* eslint-disable no-unused-vars */
-type CPSFunction<A, T> = (arg: A, callback: CPSCallback<T>) => void;
-/* eslint-enable */
-
 declare module 'pify' {
   declare interface PifyOptions {
     multiArgs?: boolean,
@@ -12,7 +7,7 @@ declare module 'pify' {
   }
 
   declare function exports<A, T>(
-    input: CPSFunction<A, T>,
+    input: CPSFunction1<A, T>,
     options: ?PifyOptions,
   ): (arg: A) => Promise<T>;
 }
