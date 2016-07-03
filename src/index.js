@@ -14,18 +14,18 @@ import type { PlainRoute } from 'react-router';
 import type { Context } from 'webpack';
 
 import Children from './components/Children';
-import { asCPSFunction1 } from './utils/promises';
+import { asCPSFunction1 } from './utils/asCPSFunction';
 
 export { Link };
 export { default as assets } from './components/assets';
 export { default as Children } from './components/Children';
-export { default as query } from './components/query';
-export { default as QueryContext } from './components/QueryContext';
 export {
+  query,
+  QueryProvider as QueryContext,
   queryRoute,
   queryChildRoutes,
   resolveQueries,
-} from './query';
+} from 'react-router-query';
 
 type RouteModule = ReactRouter$PlainRoute & {
   html?: string,
