@@ -11,8 +11,10 @@
     __SITE_ENTRY__: true
   },
   "rules": {
+    "max-len": 0,
+    "no-duplicate-imports": 0,
     "flow-vars/define-flow-type": 1,
     "flow-vars/use-flow-type": 1,
-    "max-len": 0
+    "import/no-duplicates": 2
   }
 }
