@@ -30,5 +30,5 @@ class PostsIndex extends Component {
 }
 
 export const component = query({
-  posts: queryChildRoutes('/posts'),
+  posts: queryChildRoutes('/posts', { index: false }),
 })(PostsIndex);

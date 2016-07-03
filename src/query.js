@@ -52,7 +52,7 @@ export function queryRoute(location) {
   };
 }
 
-export function queryChildRoutes(location) {
+export function queryChildRoutes(location, { index = true }) {
   return async (routes) => {
     const childRoutes = await getChildRoutes(await queryRoute(location)(routes));
     return childRoutes.map(route => ({
