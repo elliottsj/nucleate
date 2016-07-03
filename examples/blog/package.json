@@ -11,6 +11,7 @@
   "author": "Spencer Elliott <me@elliottsj.com>",
   "license": "MIT",
   "dependencies": {
-    "nucleate": "file:../.."
+    "nucleate": "file:../..",
+    "react": "^15.2.0"
   }
 }
