@@ -43,7 +43,7 @@
     "eslint-plugin-react": "^5.0.1",
     "flow-bin": "^0.27.0",
     "jest-cli": "^13.0.0",
-    "react": "^15.1.0",
+    "react": "^15.2.1",
     "react-dom": "^15.1.0"
   },
   "dependencies": {
