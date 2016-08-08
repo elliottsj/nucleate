@@ -66,7 +66,7 @@
     "invariant": "^2.2.1",
     "json-loader": "^0.5.4",
     "loader-utils": "^0.2.14",
-    "lodash": "^4.11.2",
+    "lodash": "^4.14.2",
     "markdown-it-loader": "^0.2.0",
     "memoize-id": "^0.2.0",
     "mkdirp": "^0.5.1",
