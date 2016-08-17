@@ -51,7 +51,7 @@
     "@reactivex/rxjs": "^5.0.0-beta.7",
     "argv-split": "^1.0.1",
     "babel-core": "^6.10.4",
-    "babel-loader": "^6.2.4",
+    "babel-loader": "^6.2.5",
     "babel-preset-react": "^6.5.0",
     "babel-preset-stage-1": "^6.5.0",
     "combine-loader": "^0.1.0",
