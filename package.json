@@ -79,7 +79,7 @@
     "react-router-query": "^0.0.1",
     "serialize-error": "^2.0.0",
     "url-loader": "^0.5.7",
-    "webpack": "^1.13.1",
+    "webpack": "^1.13.2",
     "webpack-chunks-api-plugin": "^0.0.2",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-hot-middleware": "^2.10.0"
