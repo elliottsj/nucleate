@@ -76,7 +76,7 @@
     "raw-loader": "^0.5.1",
     "react-dom": "^15.1.0",
     "react-router": "^2.5.2",
-    "react-router-query": "^0.0.1",
+    "react-router-query": "^0.2.0",
     "serialize-error": "^2.0.0",
     "url-loader": "^0.5.7",
     "webpack": "^1.13.1",
