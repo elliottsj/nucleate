@@ -5,10 +5,11 @@
     "flow-vars"
   ],
   "env": {
+    "jasmine": true,
     "jest": true
   },
   "globals": {
-    __SITE_ENTRY__: true
+    "__SITE_ENTRY__": true
   },
   "rules": {
     "max-len": 0,
