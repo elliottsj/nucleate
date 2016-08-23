@@ -71,7 +71,7 @@
     "json-loader": "^0.5.4",
     "loader-utils": "^0.2.14",
     "lodash": "^4.11.2",
-    "markdown-it-loader": "^0.2.0",
+    "markdown-it-loader": "^0.3.2",
     "memoize-id": "^0.2.0",
     "mkdirp": "^0.5.1",
     "npmlog": "^2.0.3",
