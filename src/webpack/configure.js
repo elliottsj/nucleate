@@ -2,7 +2,7 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import fs from 'fs';
 import path from 'path';
 import webpack from 'webpack';
-import ChunkApiPlugin from 'webpack-chunks-api-plugin';
+import XhrEvalChunkPlugin from 'xhr-eval-chunk-webpack-plugin';
 
 const babelLoader = require.resolve('babel-loader');
 const combineLoader = require.resolve('combine-loader');
@@ -16,12 +16,12 @@ const urlLoader = require.resolve('url-loader');
 const layoutLoader = require.resolve('./loaders/layout-loader');
 
 export default function configure({
-  commonsChunk = false,
   entry,
   hmr = false,
   name,
   outputPath,
   target,
+  xhrEvalChunks = false,
 }) {
   const entryDir = fs.statSync(path.dirname(entry)).isDirectory()
     ? entry
@@ -42,17 +42,17 @@ export default function configure({
       libraryTarget: 'umd',
     },
     target,
-    devtool: 'source-map',
+    devtool: 'cheap-module-eval-source-map',
     module: {
       loaders: [
         {
           test: /\.css$/,
           exclude: /\.module\.css$/,
-          loader: ExtractTextPlugin.extract(`${cssLoader}?sourceMap`),
+          loader: ExtractTextPlugin.extract({ loader: `${cssLoader}?sourceMap` }),
         },
         {
           test: /\.module\.css$/,
-          loader: ExtractTextPlugin.extract(`${cssLoader}?sourceMap&modules`),
+          loader: ExtractTextPlugin.extract({ loader: `${cssLoader}?sourceMap&modules` }),
         },
         {
           test: /\.jsx?$/,
@@ -80,25 +80,27 @@ export default function configure({
       ],
     },
     resolve: {
-      root: entryDir,
+      alias: {
+        nucleate: path.resolve(__dirname, '../..'),
+      },
+      modules: [entryDir, 'node_modules'],
       extensions: ['', '.js', '.jsx', '.json'],
     },
     resolveLoader: {
-      fallback: path.resolve(__dirname, './loaders'),
+      modules: path.resolve(__dirname, './loaders'),
     },
     plugins: [
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
         __SITE_ENTRY__: JSON.stringify(entry),
       }),
-      new ExtractTextPlugin('[name].bundle.css', { allChunks: true }),
-      ...(commonsChunk ? [
-        new webpack.optimize.CommonsChunkPlugin({ name: 'commons' }),
-      ] : []),
+      new ExtractTextPlugin({ filename: '[name].bundle.css', allChunks: true }),
       ...(hmr ? [
         new webpack.HotModuleReplacementPlugin(),
       ] : []),
-      new ChunkApiPlugin(),
+      ...(xhrEvalChunks ? [
+        new XhrEvalChunkPlugin(),
+      ] : []),
     ],
     'markdown-it': {
       preset: 'commonmark',

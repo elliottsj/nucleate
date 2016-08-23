@@ -1,9 +1,17 @@
+import pipe from 'lodash/fp/pipe';
+import filter from 'lodash/fp/filter';
+import sortBy from 'lodash/fp/sortBy';
 import React, { Component, PropTypes } from 'react';
 import {
-  query,
-  queryChildRoutes,
   Link,
+  query,
+  withQuery,
 } from 'nucleate';
+
+const filterPosts = pipe(
+  filter(post => post.fullPath !== '/posts'),
+  sortBy(post => new Date(post.meta.date)),
+);
 
 class PostsIndex extends Component {
   static propTypes = {
@@ -16,10 +24,10 @@ class PostsIndex extends Component {
 
     return (
       <div className="posts">
-        {posts.map(post => (
+        {filterPosts(posts).map(post => (
           <div key={post.path} className="post">
             <h1 className="post-title">
-              <Link to={post.fullpath}>{post.meta.title}</Link>
+              <Link to={post.fullPath}>{post.meta.title}</Link>
             </h1>
             <span className="post-date">{post.meta.date}</span>
           </div>
@@ -29,6 +37,6 @@ class PostsIndex extends Component {
   }
 }
 
-export const component = query({
-  posts: queryChildRoutes('/posts', { index: false }),
+export const component = withQuery({
+  posts: query('/posts'),
 })(PostsIndex);

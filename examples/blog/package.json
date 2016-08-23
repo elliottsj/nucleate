@@ -5,7 +5,9 @@
   "main": "index.jsx",
   "scripts": {
     "build": "nucleate build .",
+    "build-develop": "node ../../lib/bin/nucleate.js build .",
     "start": "nucleate serve .",
+    "start-develop": "node ../../lib/bin/nucleate.js serve .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Spencer Elliott <me@elliottsj.com>",
