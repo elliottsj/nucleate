@@ -59,6 +59,13 @@ export default function configure({
           include: entryDir,
           exclude: /node_modules/,
           loader: babelLoader,
+          query: {
+            presets: [
+              ['es2015', { modules: false }],
+              'stage-1',
+              'react',
+            ],
+          },
         },
         {
           test: /\.json$/,
