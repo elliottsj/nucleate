@@ -1,4 +1,4 @@
-/* @flow */
+// @flow
 
 /*
  * The module which is executed in a child process via `ChildExecutor#invoke`.

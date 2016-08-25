@@ -1,4 +1,4 @@
-/* @flow */
+// @flow
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/publishReplay';

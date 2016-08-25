@@ -1,4 +1,4 @@
-/* @flow */
+// @flow
 
 import createLogger from './createLogger';
 const log = createLogger('requireInChild');

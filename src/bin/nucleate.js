@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-/* @flow */
+// @flow
 
 import program from 'commander';
 import pkg from '../../package.json';
