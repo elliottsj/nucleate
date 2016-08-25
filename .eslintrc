@@ -5,6 +5,7 @@
     "flowtype"
   ],
   "env": {
+    "browser": true,
     "jasmine": true,
     "jest": true
   },
