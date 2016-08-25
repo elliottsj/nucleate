@@ -145,7 +145,7 @@ export function serve(
     process.stdin.resume();
     onExit(() => {
       log.info(`deleting server build directory ${serverBuildDirectory}`);
-      del.sync([serverBuildDirectory]);
+      del.sync([serverBuildDirectory], { force: true });
     });
   }
   log.info('server build directory', serverBuildDirectory);
@@ -241,7 +241,7 @@ export async function build(
     process.stdin.resume();
     onExit(() => {
       log.info(`deleting server build directory ${serverBuildDirectory}`);
-      del.sync([serverBuildDirectory]);
+      del.sync([serverBuildDirectory], { force: true });
     });
   }
   log.info('server build directory', serverBuildDirectory);
