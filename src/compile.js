@@ -1,11 +1,19 @@
 /* @flow */
 
 import createLogger from './utils/createLogger';
-const log = createLogger('serve');
 
-import { Observable } from '@reactivex/rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/publishReplay';
+import 'rxjs/add/operator/skipWhile';
+import 'rxjs/add/operator/take';
+
 import split from 'argv-split';
+import crypto from 'crypto';
+import del from 'del';
+import fs from 'fs';
 import express from 'express';
+import mkdirp from 'mkdirp';
+import os from 'os';
 import path from 'path';
 import url from 'url';
 import webpack from 'webpack';
@@ -16,9 +24,23 @@ import webpackHotMiddleware from 'webpack-hot-middleware';
 import createChildExecutor from './utils/createChildExecutor';
 import configure from './webpack/configure';
 
+import type {
+  Compiler,
+} from 'webpack';
+
 // If a BUNDLE_ARGV env var is defined, pass it as arguments
 // to the child process executing the bundle
 const BUNDLE_ARGV = split(process.env.BUNDLE_ARGV || '');
+
+/**
+ * Get the path to a unique temporary directory to which server build assets will be emitted.
+ * Uniqueness is required for when multiple `serve` / `build` invocations are running concurrently.
+ */
+function getServerBuildDirectory(): string {
+  // Generate a random string to ensure uniqueness
+  const buildToken = crypto.randomBytes(16).toString('hex');
+  return path.resolve(os.tmpdir(), `nucleate-${buildToken}`);
+}
 
 /**
  * Create a hot observable which emits `null` when the webpack build is in
@@ -30,7 +52,7 @@ const BUNDLE_ARGV = split(process.env.BUNDLE_ARGV || '');
  * @return {Observable}
  *   A hot RxJS Observable
  */
-function createWebpack$(compiler: webpack.Compiler): Observable {
+function createWebpack$(compiler: Compiler): Observable {
   const webpack$ = Observable.create((observer) => {
     compiler.plugin('invalid', () => observer.next(null));
     compiler.plugin('failed', error => observer.error(error));
@@ -51,8 +73,24 @@ function getBundlePath(stats: Stats): string {
   );
 }
 
+type CompileOptions = {
+  devtool?: string,
+  minify: boolean,
+  preserveBuild?: boolean,
+  source: string,
+};
+
+type BuildOptions = CompileOptions & {
+  destination: string,
+};
+
+type ServeOptions = CompileOptions & {
+  hostname: string,
+  port: number,
+};
+
 /**
- * Serve the Nucleate site from the given directory.
+ * Serve a Nucleate site from the given directory.
  * @param  {string} source
  *   Path to the directory containing the site root
  * @param  {number} port
@@ -60,7 +98,17 @@ function getBundlePath(stats: Stats): string {
  * @param  {string} hostname
  *   Hostname on which to serve the site
  */
-export default function serve(source: string, port: number, hostname: string) {
+export function serve(
+  {
+    devtool,
+    hostname = undefined,
+    minify,
+    port,
+    preserveBuild = false,
+    source,
+  }: ServeOptions
+) {
+  const log = createLogger('serve');
   const entry = path.resolve(source);
   log.info(`serving ${entry}`);
 
@@ -69,12 +117,15 @@ export default function serve(source: string, port: number, hostname: string) {
    * webpack-dev-middleware, with hot reload via webpack-hot-middleware.
    */
   const clientConfig = configure({
+    devtool,
     entry,
     hmr: true,
-    name: 'client',
+    minify,
     // Output to the root of webpack-dev-middleware's memory file system
     outputPath: '/',
     target: 'web',
+    // Dynamically load chunks via XHR + eval, instead of webpack's default <script> tag method,
+    // since extra <script> tags will cause React to fail to reuse markup upon render.
     xhrEvalChunks: true,
   });
   const clientCompiler = webpack(clientConfig);
@@ -84,18 +135,20 @@ export default function serve(source: string, port: number, hostname: string) {
   });
   const hotMiddleware = webpackHotMiddleware(clientCompiler);
 
+  // Output to a unique build directory
+  const serverBuildDirectory = getServerBuildDirectory();
+  log.info('server assets directory', serverBuildDirectory);
+
   /*
    * Configure and start webpack bundler for the server for static rendering.
    * Resulting bundle is executed in a child process for each incoming request.
    */
   const serverConfig = configure({
+    devtool: 'source-map',
     entry,
     hmr: false,
     name: 'server',
-    // Output to 'node_modules/nucleate/build'
-    // XXX: only one site can be served at a time per node_modules directory
-    // TODO: output to unique location (memory?) to allow multiple sites
-    outputPath: path.resolve(__dirname, '../build'),
+    outputPath: serverBuildDirectory,
     target: 'node',
   });
   const serverCompiler = webpack(serverConfig);
@@ -136,5 +189,80 @@ export default function serve(source: string, port: number, hostname: string) {
       hostname: address.address,
       port: address.port,
     })}`);
+  });
+}
+
+/**
+ * Build a Nucleate site from the given directory.
+ */
+export async function build(
+  {
+    devtool,
+    destination,
+    minify = false,
+    preserveBuild = false,
+    source,
+  }: BuildOptions
+) {
+  const log = createLogger('build');
+  const entry = path.resolve(source);
+  log.info(`building ${entry}`);
+
+  const clientBuildDirectory = path.resolve(destination);
+  log.info(`output in ${clientBuildDirectory}`);
+  await del([clientBuildDirectory]);
+
+  const clientConfig = configure({
+    devtool,
+    entry,
+    hmr: false,
+    minify,
+    outputPath: path.resolve(clientBuildDirectory, 'assets'),
+    target: 'web',
+    // Dynamically load chunks via XHR + eval, instead of webpack's default <script> tag method,
+    // since extra <script> tags will cause React to fail to reuse markup upon render.
+    xhrEvalChunks: true,
+  });
+
+  // Output to a unique build directory
+  const serverBuildDirectory = getServerBuildDirectory();
+  log.info('server assets directory', serverBuildDirectory);
+
+  const serverConfig = configure({
+    devtool: 'source-map',
+    entry,
+    hmr: false,
+    outputPath: serverBuildDirectory,
+    target: 'node',
+  });
+  const clientCompiler = webpack(clientConfig);
+  clientCompiler.run((err, stats) => {
+    if (err) {
+      throw err;
+    }
+    log.info('client webpack completed');
+    log.log('info', stats.toString({ chunkModules: false, colors: true }));
+  });
+
+  const serverCompiler = webpack(serverConfig);
+  serverCompiler.run(async (err, stats) => {
+    if (err) {
+      throw err;
+    }
+    const bundlePath = getBundlePath(stats);
+    const bundleExecutor = createChildExecutor(bundlePath, BUNDLE_ARGV);
+    try {
+      const routesMarkup = await bundleExecutor.invoke('renderAll');
+      for (const [routePath, markup] of routesMarkup) {
+        const htmlPath = path.resolve(destination, routePath.replace(/^\//, ''), 'index.html');
+        log.info(`rendering ${htmlPath}`);
+        mkdirp.sync(path.dirname(htmlPath));
+        fs.writeFileSync(htmlPath, markup);
+      }
+    } catch (error) {
+      log.error(error.stack);
+    }
+    log.info('server webpack completed');
+    log.log('info', stats.toString({ chunkModules: false, colors: true }));
   });
 }

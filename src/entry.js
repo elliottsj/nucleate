@@ -1,13 +1,17 @@
 import 'babel-polyfill';
 
 import memoize from 'memoize-id';
-import { resolveComponentsQueries, RoutesProvider, synchronize } from 'react-router-query';
+import {
+  resolveComponentsQueries,
+  query,
+  RoutesProvider,
+  synchronize,
+} from 'react-router-query';
 import pify from 'pify';
 import React, { Component, PropTypes } from 'react';
 import { render } from 'react-dom';
 import { renderToString } from 'react-dom/server';
 import { browserHistory, match, Router, RouterContext } from 'react-router';
-import url from 'url';
 
 import { createRoute } from '.';
 
@@ -109,23 +113,6 @@ if (typeof document !== 'undefined') {
   renderToDocument(location);
 }
 
-async function collectRoutePaths(prefix, route): Promise<Array<string>> {
-  const routePath = url.resolve(prefix, route.path);
-  if (/\*|:|\(|\)/.test(routePath)) {
-    // Cannot handle react-router's dynamic route matching; only static routes
-    return [];
-  }
-  if (!route.getChildRoutes) {
-    return [routePath];
-  }
-  const childRoutes = await pify(route.getChildRoutes)(/* location: */ routePath);
-  return await childRoutes.reduce(
-    async (paths, childRoute) =>
-      [...(await paths), ...(await collectRoutePaths(routePath, childRoute))],
-    [routePath]
-  );
-}
-
 export function renderPath(location) {
   return new Promise((resolve, reject) => {
     console.log(`matching ${location}`);
@@ -174,8 +161,10 @@ export function renderPath(location) {
 }
 
 export async function renderAll() {
-  const routePaths = await collectRoutePaths(/* start at root path */ '', routes);
-  return new Map(await Promise.all(routePaths.map(async (routePath) =>
-    [routePath, await renderPath(routePath)]
+  const routePaths = (await pify(query)('', routes))
+    .map(route => route.fullPath)
+    .filter(routePath => !/\*|:|\(|\)/.test(routePath));
+  return new Map(await Promise.all(routePaths.map(
+    async (routePath) => [routePath, await renderPath(routePath)]
   )));
 }

@@ -1,4 +1,5 @@
 import parallel from 'async/parallel';
+import filter from 'lodash/fp/filter';
 import map from 'lodash/fp/map';
 import pipe from 'lodash/fp/pipe';
 import sortBy from 'lodash/fp/sortBy';
@@ -83,6 +84,8 @@ export const createRoutesFromModules: (modules: ContextRouteModule[]) => PlainRo
   // e.g. choose './posts' over './posts.jsx'
   sortBy(([modulePath]) => modulePath.length),
   uniqBy(([, mod]) => mod),
+  // Exclude index modules, they should be included in a separate `includeRoute` call
+  filter(([modulePath]) => !modulePath.endsWith('/index')),
   map(([modulePath, mod]) => createRoute(mod, basenameWithoutExtension(modulePath))),
 );
 

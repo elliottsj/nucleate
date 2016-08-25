@@ -2,6 +2,7 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import fs from 'fs';
 import path from 'path';
 import webpack from 'webpack';
+import StatsPlugin from 'stats-webpack-plugin';
 import XhrEvalChunkPlugin from 'xhr-eval-chunk-webpack-plugin';
 
 const babelLoader = require.resolve('babel-loader');
@@ -16,8 +17,10 @@ const urlLoader = require.resolve('url-loader');
 const layoutLoader = require.resolve('./loaders/layout-loader');
 
 export default function configure({
+  devtool,
   entry,
   hmr = false,
+  minify = false,
   name,
   outputPath,
   target,
@@ -42,7 +45,7 @@ export default function configure({
       libraryTarget: 'umd',
     },
     target,
-    devtool: 'cheap-module-eval-source-map',
+    devtool,
     module: {
       loaders: [
         {
@@ -60,6 +63,7 @@ export default function configure({
           exclude: /node_modules/,
           loader: babelLoader,
           query: {
+            babelrc: false,
             presets: [
               ['es2015', { modules: false }],
               'stage-1',
@@ -98,12 +102,19 @@ export default function configure({
     },
     plugins: [
       new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+        'process.env.NODE_ENV': JSON.stringify(minify ? 'production' : 'development'),
         __SITE_ENTRY__: JSON.stringify(entry),
       }),
+      new webpack.LoaderOptionsPlugin({
+        minimize: minify,
+      }),
+      new StatsPlugin('stats.json'),
       new ExtractTextPlugin({ filename: '[name].bundle.css', allChunks: true }),
       ...(hmr ? [
         new webpack.HotModuleReplacementPlugin(),
+      ] : []),
+      ...(minify ? [
+        new webpack.optimize.UglifyJsPlugin(),
       ] : []),
       ...(xhrEvalChunks ? [
         new XhrEvalChunkPlugin(),

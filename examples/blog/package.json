@@ -5,10 +5,11 @@
   "main": "index.jsx",
   "scripts": {
     "build": "nucleate build .",
-    "build-develop": "node ../../lib/bin/nucleate.js build .",
+    "build:develop": "node ../../lib/bin/nucleate.js build .",
+    "build:production": "nucleate build . --minify --devtool=none",
     "start": "nucleate serve .",
-    "start-develop": "node ../../lib/bin/nucleate.js serve .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:develop": "node ../../lib/bin/nucleate.js serve .",
+    "test": "npm run build"
   },
   "author": "Spencer Elliott <me@elliottsj.com>",
   "license": "MIT",
