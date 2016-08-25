@@ -1,9 +1,0 @@
-machine:
-  node:
-    version: 5.11.0
-  post:
-    - npm install -g npm@3.8.8
-
-dependencies:
-  override:
-    - npm prune && npm install
