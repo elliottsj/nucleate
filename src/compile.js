@@ -1,7 +1,5 @@
 /* @flow */
 
-import createLogger from './utils/createLogger';
-
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/publishReplay';
 import 'rxjs/add/operator/skipWhile';
@@ -21,12 +19,13 @@ import Stats from 'webpack/lib/Stats';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 
-import createChildExecutor from './utils/createChildExecutor';
-import configure from './webpack/configure';
-
 import type {
   Compiler,
 } from 'webpack';
+
+import createChildExecutor from './utils/createChildExecutor';
+import createLogger from './utils/createLogger';
+import configure from './webpack/configure';
 
 // If a BUNDLE_ARGV env var is defined, pass it as arguments
 // to the child process executing the bundle
@@ -71,6 +70,11 @@ function getBundlePath(stats: Stats): string {
     stats.compilation.compiler.outputPath,
     Array.isArray(mainAssets) ? mainAssets[0] : mainAssets
   );
+}
+
+function onExit(cb) {
+  process.on('exit', cb);
+  process.on('SIGINT', () => process.exit(0));
 }
 
 type CompileOptions = {
@@ -137,7 +141,14 @@ export function serve(
 
   // Output to a unique build directory
   const serverBuildDirectory = getServerBuildDirectory();
-  log.info('server assets directory', serverBuildDirectory);
+  if (!preserveBuild) {
+    process.stdin.resume();
+    onExit(() => {
+      log.info(`deleting server build directory ${serverBuildDirectory}`);
+      del.sync([serverBuildDirectory]);
+    });
+  }
+  log.info('server build directory', serverBuildDirectory);
 
   /*
    * Configure and start webpack bundler for the server for static rendering.
@@ -226,7 +237,14 @@ export async function build(
 
   // Output to a unique build directory
   const serverBuildDirectory = getServerBuildDirectory();
-  log.info('server assets directory', serverBuildDirectory);
+  if (!preserveBuild) {
+    process.stdin.resume();
+    onExit(() => {
+      log.info(`deleting server build directory ${serverBuildDirectory}`);
+      del.sync([serverBuildDirectory]);
+    });
+  }
+  log.info('server build directory', serverBuildDirectory);
 
   const serverConfig = configure({
     devtool: 'source-map',

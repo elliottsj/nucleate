@@ -1,9 +1,8 @@
 #! /usr/bin/env node
 /* @flow */
 
-import pkg from '../../package.json';
 import program from 'commander';
-
+import pkg from '../../package.json';
 import {
   build,
   serve,
