@@ -34,7 +34,7 @@ export default function configure({
     name,
     entry: [
       ...(hmr ? [`${require.resolve('webpack-hot-middleware/client')}?reload=true`] : []),
-      require.resolve('../entry'),
+      require.resolve('../entry.jsx'),
     ],
     output: {
       path: outputPath,

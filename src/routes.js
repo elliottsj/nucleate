@@ -6,14 +6,11 @@ import sortBy from 'lodash/fp/sortBy';
 import uniqBy from 'lodash/fp/uniqBy';
 import memoize from 'memoize-id';
 import path from 'path';
-import React from 'react';
-import renderHTML from '@elliottsj/react-render-html';
-import { Link } from 'react-router';
 
 import type { PlainRoute } from 'react-router';
 import type { Context } from 'webpack';
 
-import Children from './components/Children';
+import createHTMLComponent from './components/createHTMLComponent';
 
 type RouteModule = ReactRouter$PlainRoute & {
   html?: string,
@@ -22,29 +19,6 @@ type RouteModule = ReactRouter$PlainRoute & {
 };
 type ModulePath = string;
 type ContextRouteModule = [ModulePath, RouteModule];
-
-function replaceLinks() {
-  return (next) => (node, key) => {
-    const element = next(node, key);
-    if (node.tagName === 'a' && /^~/.test(element.props.href)) {
-      return <Link {...element.props} to={element.props.href.replace(/^~/, '')} />;
-    }
-    return element;
-  };
-}
-
-export function createHTMLComponent(Layout = Children, meta, html) {
-  return function HTMLFragment() {
-    return (
-      <Layout {...meta}>
-        {/* need wrapper div in case `Layout === Children` and renderHTML returns an array */}
-        <div>
-          {renderHTML(html, replaceLinks)}
-        </div>
-      </Layout>
-    );
-  };
-}
 
 /**
  * Create a react-router PlainRoute from the given module and optional routePath.
@@ -92,7 +66,9 @@ export const createRoutesFromModules: (modules: ContextRouteModule[]) => PlainRo
 /**
  * Create a memoized CPS function which resolves with the module resolved by the given module loader
  */
-export function includeRoute(loadModule: CPSFunction0<RouteModule>): NodeCPSFunction1<any, PlainRoute> {
+export function includeRoute(
+  loadModule: CPSFunction0<RouteModule>
+): NodeCPSFunction1<any, PlainRoute> {
   return memoize((partialNextState, cb) => {
     loadModule(mod => cb(null, createRoute(mod)));
   }, { arity: 0, async: 'immediate' });

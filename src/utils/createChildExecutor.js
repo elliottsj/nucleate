@@ -1,15 +1,16 @@
 // @flow
 
-import createLogger from './createLogger';
-const log = createLogger('requireInChild');
-
 import childProcess from 'child_process';
 import { EventEmitter } from 'events';
 import path from 'path';
 
+import createLogger from './createLogger';
+
 export interface ChildExecutor {
   invoke(fnName: string, ...args: Array<any>): Promise<JSON>;
 }
+
+const log = createLogger('requireInChild');
 
 /**
  * Create an EventEmitter which emits messages from the executing child process.
