@@ -269,16 +269,12 @@ export async function build(
     }
     const bundlePath = getBundlePath(stats);
     const bundleExecutor = createChildExecutor(bundlePath, BUNDLE_ARGV);
-    try {
-      const routesMarkup = await bundleExecutor.invoke('renderAll');
-      for (const [routePath, markup] of routesMarkup) {
-        const htmlPath = path.resolve(destination, routePath.replace(/^\//, ''), 'index.html');
-        log.info(`rendering ${htmlPath}`);
-        mkdirp.sync(path.dirname(htmlPath));
-        fs.writeFileSync(htmlPath, markup);
-      }
-    } catch (error) {
-      log.error(error.stack);
+    const routesMarkup = await bundleExecutor.invoke('renderAll');
+    for (const [routePath, markup] of routesMarkup) {
+      const htmlPath = path.resolve(destination, routePath.replace(/^\//, ''), 'index.html');
+      log.info(`rendering ${htmlPath}`);
+      mkdirp.sync(path.dirname(htmlPath));
+      fs.writeFileSync(htmlPath, markup);
     }
     log.info('server webpack completed');
     log.log('info', stats.toString({ chunkModules: false, colors: true }));
