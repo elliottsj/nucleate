@@ -1,5 +1,3 @@
-import 'babel-polyfill';
-
 import memoize from 'memoize-id';
 import React from 'react';
 import {
