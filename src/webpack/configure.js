@@ -92,9 +92,6 @@ export default function configure({
       ],
     },
     resolve: {
-      alias: {
-        nucleate: path.resolve(__dirname, '../..'),
-      },
       modules: [entryDir, 'node_modules'],
       extensions: ['', '.js', '.jsx', '.json'],
     },
