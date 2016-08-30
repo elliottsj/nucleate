@@ -282,5 +282,6 @@ export async function build(
     }
     log.info('server webpack completed');
     log.log('info', stats.toString({ chunkModules: false, colors: true }));
+    process.stdin.pause();
   });
 }
