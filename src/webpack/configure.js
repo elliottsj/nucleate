@@ -6,6 +6,7 @@ import StatsPlugin from 'stats-webpack-plugin';
 import XhrEvalChunkPlugin from 'xhr-eval-chunk-webpack-plugin';
 
 const babelLoader = require.resolve('babel-loader');
+const bundleLoader = require.resolve('bundle-loader');
 const combineLoader = require.resolve('combine-loader');
 const cssLoader = require.resolve('css-loader');
 const frontMatterLoader = require.resolve('front-matter-loader');
@@ -98,6 +99,9 @@ export default function configure({
       extensions: ['', '.js', '.jsx', '.json'],
     },
     resolveLoader: {
+      alias: {
+        route: `${bundleLoader}?lazy`,
+      },
       modules: [path.resolve(__dirname, './loaders'), 'node_modules'],
     },
     plugins: [
