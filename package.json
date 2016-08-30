@@ -1,6 +1,6 @@
 {
   "name": "nucleate",
-  "version": "0.1.0-alpha.6",
+  "version": "0.1.0-alpha.7",
   "description": "A static site generator powered by React and webpack",
   "main": "lib/index.js",
   "bin": "lib/bin/nucleate.js",
