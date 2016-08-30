@@ -34,7 +34,7 @@ export default function configure({
     name,
     entry: [
       ...(hmr ? [`${require.resolve('webpack-hot-middleware/client')}?reload=true`] : []),
-      require.resolve('../entry.jsx'),
+      require.resolve('../entry'),
     ],
     output: {
       path: outputPath,
@@ -62,14 +62,6 @@ export default function configure({
           include: entryDir,
           exclude: /node_modules/,
           loader: babelLoader,
-          query: {
-            babelrc: false,
-            presets: [
-              ['es2015', { modules: false }],
-              'stage-1',
-              'react',
-            ],
-          },
         },
         {
           test: /\.json$/,
@@ -98,7 +90,7 @@ export default function configure({
       extensions: ['', '.js', '.jsx', '.json'],
     },
     resolveLoader: {
-      modules: path.resolve(__dirname, './loaders'),
+      modules: [path.resolve(__dirname, './loaders'), 'node_modules'],
     },
     plugins: [
       new webpack.DefinePlugin({
