@@ -65,9 +65,9 @@ export default function configure({
           query: {
             babelrc: false,
             presets: [
-              'es2015',
-              'stage-1',
-              'react',
+              require.resolve('babel-preset-es2015'),
+              require.resolve('babel-preset-stage-1'),
+              require.resolve('babel-preset-react'),
             ],
           },
         },
