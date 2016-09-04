@@ -13,6 +13,7 @@ const frontMatterLoader = require.resolve('front-matter-loader');
 const htmlLoader = require.resolve('html-loader');
 const jsonLoader = require.resolve('json-loader');
 const markdownItLoader = require.resolve('markdown-it-loader');
+const sassLoader = require.resolve('sass-loader');
 const urlLoader = require.resolve('url-loader');
 
 const layoutLoader = require.resolve('./loaders/layout-loader');
@@ -52,11 +53,21 @@ export default function configure({
         {
           test: /\.css$/,
           exclude: /\.module\.css$/,
-          loader: ExtractTextPlugin.extract({ loader: `${cssLoader}?sourceMap` }),
+          loader: ExtractTextPlugin.extract({
+            loader: `${cssLoader}?sourceMap`,
+          }),
         },
         {
           test: /\.module\.css$/,
-          loader: ExtractTextPlugin.extract({ loader: `${cssLoader}?sourceMap&modules` }),
+          loader: ExtractTextPlugin.extract({
+            loader: `${cssLoader}?sourceMap&modules`,
+          }),
+        },
+        {
+          test: /\.scss$/,
+          loader: ExtractTextPlugin.extract({
+            loader: `${sassLoader}?sourceMap!${cssLoader}?sourceMap`,
+          }),
         },
         {
           test: /\.jsx?$/,
