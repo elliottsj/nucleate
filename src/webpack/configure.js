@@ -66,7 +66,7 @@ export default function configure({
         {
           test: /\.scss$/,
           loader: ExtractTextPlugin.extract({
-            loader: `${sassLoader}?sourceMap!${cssLoader}?sourceMap`,
+            loader: `${cssLoader}?sourceMap!${sassLoader}?sourceMap`,
           }),
         },
         {
