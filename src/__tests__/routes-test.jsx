@@ -4,19 +4,24 @@
 import React, { Component } from 'react';
 import { shallow } from 'enzyme';
 import {
-  basenameWithoutExtension,
   createRoute,
   createRoutesFromModules,
+  getRoutePath,
   includeRoute,
   includeRoutes,
 } from '../routes';
 
-describe('basenameWithoutExtension', () => {
-  it('returns the basename of the given path, without the extension', () => {
-    expect(basenameWithoutExtension('./path/to/index.jsx')).toBe('index');
-    expect(basenameWithoutExtension('/path/to/hello.txt')).toBe('hello');
-    expect(basenameWithoutExtension('foobar.json')).toBe('foobar');
-    expect(basenameWithoutExtension('.js')).toBe('.js');
+describe('getRoutePath', () => {
+  it('returns the correct route path given a module path', () => {
+    expect(getRoutePath('./about.md')).toBe('about');
+    expect(getRoutePath('./posts')).toBe('posts');
+    expect(getRoutePath('./posts.jsx')).toBe('posts');
+    expect(getRoutePath('./2014-07-26-hello.md')).toBe('2014-07-26-hello');
+    expect(
+      getRoutePath('./2014/01/09/public-key-authentication-on-cdf.md')
+    ).toBe(
+      '2014/01/09/public-key-authentication-on-cdf'
+    );
   });
 });
 

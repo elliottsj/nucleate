@@ -49,8 +49,11 @@ export function createRoute(mod, routePath) {
   };
 }
 
-export function basenameWithoutExtension(moduleName) {
-  return path.basename(moduleName, path.extname(moduleName));
+export function getRoutePath(moduleName) {
+  return path.join(
+    path.dirname(moduleName),
+    path.basename(moduleName, path.extname(moduleName))
+  );
 }
 
 export const createRoutesFromModules: (modules: ContextRouteModule[]) => PlainRoute[] = pipe(
@@ -60,7 +63,7 @@ export const createRoutesFromModules: (modules: ContextRouteModule[]) => PlainRo
   uniqBy(([, mod]) => mod),
   // Exclude index modules, they should be included in a separate `includeRoute` call
   filter(([modulePath]) => !modulePath.endsWith('/index')),
-  map(([modulePath, mod]) => createRoute(mod, basenameWithoutExtension(modulePath))),
+  map(([modulePath, mod]) => createRoute(mod, getRoutePath(modulePath))),
 );
 
 /**
